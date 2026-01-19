@@ -18,7 +18,9 @@ import {
   FaChevronRight,
   FaRegQuestionCircle,
   FaDownload,
-  FaPlus
+  FaPlus,
+  FaSquare,
+  FaCoins
 } from 'react-icons/fa';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
@@ -64,18 +66,40 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   const menuItems = [
     { id: 'dashboard', icon: <FaTachometerAlt />, text: 'Dashboard', path: '/' },
     { id: 'users', icon: <FaUsers />, text: 'Users', path: '/users' },
-    { id: 'Category', icon: <FaPlus />, text: 'Categories', path: '/categories' },
     {
-      id: 'AllHouses',
-      icon: <FaHome />,
-      text: 'AllHouses',
-      path: '/allhouses',
+      id: 'AllRooms',
+      icon: <FaSquare />,
+      text: 'AllRooms',
+      path: '/allrooms',
       subItems: [
-        // { id: 'Houses', text: 'Create House', path: '/create-house' },
-        { id: 'All Houses', text: 'All Houses', path: '/allhouses' }
+        { id: 'All Rooms', text: 'All Rooms', path: '/allrooms' }
       ]
     },
-    // { id: 'plans', icon: <FaFileInvoiceDollar />, text: 'Plans', path: '/plans' },
+    {
+      id: 'Coins Packages',
+      icon: <FaCoins />,
+      text: 'Coins Packages',
+      path: '/coins-packages',
+      subItems: [
+        { id: 'Coins Packages', text: 'Create Coins Packages', path: '/create-coin-package' },
+        { id: 'Coins Packages', text: 'Coins Packages', path: '/all-coin-packages' },
+        { id: 'Coins Prices', text: 'Coins Prices', path: '/coins-prices' }
+      ]
+    },
+    { id: 'Payments', icon: <FaFileInvoiceDollar />, text: 'Payments', path: '/all-payments' },
+    {
+      id: 'Forms&Reports',
+      icon: <FaRegQuestionCircle />,
+      text: 'Forms & Reports',
+      path: '/forms-reports',
+      subItems: [
+        { id: 'Complaints', text: 'All Complaints', path: '/complaints' },
+        { id: 'Reports', text: 'All Reports', path: '/reports' },
+        { id: 'Warnings', text: 'All Warnings', path: '/warnings' },
+        { id: 'Feedback', text: 'All Feedback', path: '/feedback' },
+        { id: 'Contact', text: 'All Contact', path: '/contactus' }
+      ]
+    },
     { id: 'Settings', icon: <FaCog />, text: 'Settings', path: '/settings' },
   ];
 
@@ -150,12 +174,17 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
           {/* Logo */}
           {!collapsed ? (
             <div className="flex items-center cursor-pointer" onClick={() => onNavigate('/')}>
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white font-bold">A</span>
+              <div className="w-8 h-8  rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+                <img
+                  src="/logo.png"   // or your logo path
+                  alt="Logo"
+                  className="w-8 h-8 object-contain rounded-lg"
+                />
               </div>
+
               <div>
-                <h1 className="text-xl font-bold">Admin</h1>
-                <p className="text-xs text-gray-500">v2.0</p>
+                <h1 className="text-xl font-bold">Mustivibes</h1>
+                <p className="text-xs text-gray-500">Admin Panel</p>
               </div>
             </div>
           ) : (
