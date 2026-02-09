@@ -11,16 +11,27 @@ import {
   FaUser,
   FaSignOutAlt,
   FaCompress,
-  FaExpand
+  FaExpand,
+  FaHeart,
+  FaFire,
+  FaUsers,
+  FaChartLine,
+  FaBox,
+  FaDollarSign
 } from 'react-icons/fa';
-import { FiChevronDown, FiMenu } from 'react-icons/fi';
+import { FiChevronDown, FiMenu, FiHeart, FiMessageSquare, FiSettings } from 'react-icons/fi';
+import { MdFavorite, MdEmojiPeople, MdDashboard } from 'react-icons/md';
 
 const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpen }) => {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState('');
+
+  const adminData = JSON.parse(sessionStorage.getItem("AdminData"));
+
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -32,168 +43,292 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
     }
   };
 
-
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
+    const updateTimeOfDay = () => {
+      const hour = new Date().getHours();
+      if (hour < 12) setTimeOfDay('Morning');
+      else if (hour < 18) setTimeOfDay('Afternoon');
+      else setTimeOfDay('Evening');
+    };
+
     checkMobile();
+    updateTimeOfDay();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const notifications = [
-    { id: 1, text: 'New order received', time: '5 min ago', unread: true },
-    { id: 2, text: 'Server backup completed', time: '1 hour ago', unread: true },
-    { id: 3, text: 'New user registered', time: '2 hours ago', unread: false },
+    { id: 1, text: 'New user match made!', time: '2 min ago', unread: true, icon: <FiHeart className="text-pink-500" /> },
+    { id: 2, text: 'Premium subscription activated', time: '15 min ago', unread: true, icon: <FaFire className="text-orange-500" /> },
+    { id: 3, text: 'Report received from user', time: '1 hour ago', unread: true, icon: <MdEmojiPeople className="text-blue-500" /> },
+    { id: 4, text: 'New message in VIP chat', time: '3 hours ago', unread: false, icon: <FiMessageSquare className="text-green-500" /> },
+    { id: 5, text: 'Monthly analytics ready', time: '5 hours ago', unread: false, icon: <FaChartLine className="text-purple-500" /> },
   ];
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
+  // Profile menu items
+  const profileMenu = [
+    { icon: <FaBox className="text-pink-500" />, text: 'Dashboard', path: '/admin/' },
+    { icon: <FiSettings className="text-blue-500" />, text: 'Account Settings', path: '/admin/settings' },
+    { icon: <FaDollarSign className="text-red-500" />, text: 'Payments', path: '/admin/payments' },
+    { icon: <FaUsers className="text-green-500" />, text: 'Manage Team', path: '/team' },
+  ];
+
   return (
     <header className={`
-      ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}
-      border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}
+      ${darkMode ? 'bg-gray-900/90' : 'bg-white/90'}
+      backdrop-blur-xl
+      border-b border-pink-500/20
       px-4 py-3
       flex items-center justify-between
       transition-all duration-300
-      sticky top-0 z-30
+      sticky top-0 z-50
+      shadow-lg
       ${sidebarOpen ? 'md:ml-0' : 'md:ml-0'}
     `}>
+
       {/* Left Section */}
       <div className="flex items-center space-x-4">
-        {/* Menu Toggle Button */}
+        {/* Menu Toggle Button with gradient */}
         <button
           onClick={toggleSidebar}
-          className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+          className={`
+            p-2.5 rounded-xl 
+            bg-gradient-to-r from-pink-500/10 to-red-500/10
+            hover:from-pink-500/20 hover:to-red-500/20
+            border border-pink-500/20
+            transition-all duration-300
+            hover:scale-105
+            shadow-sm
+            ${isMobile ? "" : "d-none"}
+          `}
           aria-label="Toggle menu"
         >
-          {isMobile ? (
-            <FiMenu className="text-xl" />
-          ) : ("")}
+          <FiMenu className="text-xl text-pink-500" />
         </button>
 
-        {/* Breadcrumb/Page Title */}
-        <div className="hidden md:block">
-          <h1 className="text-lg font-semibold">
-            Dashboard
-            {collapsed && <span className="text-xs text-gray-500 ml-2">(Collapsed)</span>}
-          </h1>
-          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            Welcome back, Admin
-          </p>
+        {/* Logo/Brand for mobile */}
+        <div className="md:hidden flex items-center">
+
+          <span className="font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+            Mustivibes
+          </span>
         </div>
 
-        {/* Mobile Search Toggle */}
-        <button
-          onClick={() => setSearchOpen(!searchOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-          aria-label="Search"
-        >
-          <FaSearch className="text-lg" />
-        </button>
+        {/* Breadcrumb/Page Title with gradient */}
+        <div className="hidden md:block">
+          <div className="flex items-center space-x-3">
+
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                Mustivibes
+              </h1>
+              <p className={`text-sm ${darkMode ? 'text-pink-400/70' : 'text-pink-600/70'} font-medium`}>
+                Good {timeOfDay}, Admin! <span className="ml-2 animate-pulse">❤️</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-
-      
-
-      
 
       {/* Right Section */}
       <div className="flex items-center space-x-2 md:space-x-3">
-        {/* Dark Mode Toggle */}
+
+        {/* Search Bar - Desktop */}
+        <div className="hidden md:block relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search matches, users, reports..."
+              className={`
+                pl-10 pr-4 py-2.5
+                w-64
+                rounded-xl
+                ${darkMode ? 'bg-gray-800/50 text-white' : 'bg-gray-50 text-gray-800'}
+                border border-pink-500/30
+                focus:border-pink-500/60
+                focus:outline-none
+                focus:ring-2 focus:ring-pink-500/20
+                transition-all duration-300
+                placeholder:${darkMode ? 'text-gray-400' : 'text-gray-500'}
+              `}
+            />
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-pink-500" />
+          </div>
+        </div>
+
+        {/* Dark Mode Toggle with gradient */}
         <button
           onClick={toggleDarkMode}
-          className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-          title={darkMode ? 'Light Mode' : 'Dark Mode'}
+          className={`
+            p-2.5 rounded-xl 
+            bg-gradient-to-r from-pink-500/10 to-red-500/10
+            hover:from-pink-500/20 hover:to-red-500/20
+            border border-pink-500/20
+            transition-all duration-300
+            hover:scale-105
+            relative overflow-hidden
+          `}
+          title={darkMode ? 'Switch to Light' : 'Switch to Dark'}
           aria-label="Toggle dark mode"
         >
           {darkMode ? (
-            <FaSun className="text-lg text-yellow-400" />
+            <FaSun className="text-xl text-yellow-400" />
           ) : (
-            <FaMoon className="text-lg" />
+            <FaMoon className="text-xl text-purple-500" />
           )}
         </button>
 
         {/* Fullscreen Button */}
         <button
           onClick={toggleFullscreen}
+          className={`
+            p-2.5 rounded-xl 
+            bg-gradient-to-r from-pink-500/10 to-red-500/10
+            hover:from-pink-500/20 hover:to-red-500/20
+            border border-pink-500/20
+            transition-all duration-300
+            hover:scale-105
+            relative group
+          `}
           title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-          className={`relative p-2 rounded-lg transition-colors
-    ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}
-  `}
         >
           {isFullscreen ? (
-            <FaCompress className="text-lg" />
+            <FaCompress className="text-lg text-pink-500" />
           ) : (
-            <FaExpand className="text-lg" />
+            <FaExpand className="text-lg text-pink-500" />
           )}
+          <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            {isFullscreen ? 'E' : 'F'}
+          </div>
         </button>
 
 
-        {/* Notifications */}
+
+        {/* Notifications with premium dropdown */}
         <div className="relative">
           <button
             onClick={() => setNotificationOpen(!notificationOpen)}
-            className={`relative p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+            className={`
+              p-2.5 rounded-xl 
+              bg-gradient-to-r from-pink-500/10 to-red-500/10
+              hover:from-pink-500/20 hover:to-red-500/20
+              border border-pink-500/20
+              transition-all duration-300
+              hover:scale-105
+              relative group
+            `}
           >
-            <FaBell className="text-lg" />
+            <FaBell className="text-lg text-pink-500" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse shadow-lg">
                 {unreadCount}
               </span>
             )}
+            {/* Animated ring */}
+            <div className="absolute inset-0 rounded-xl border-2 border-pink-500/0 group-hover:border-pink-500/30 transition-all duration-300" />
           </button>
 
-          {/* Notification Dropdown */}
+          {/* Premium Notification Dropdown */}
           {notificationOpen && (
             <>
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setNotificationOpen(false)}
-              ></div>
+              />
               <div className={`
-                absolute right-0 mt-2 w-80
-                ${darkMode ? 'bg-gray-800' : 'bg-white'}
-                rounded-lg shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'}
+                absolute right-0 mt-2 w-96
+                ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'}
+                backdrop-blur-xl
+                rounded-2xl shadow-2xl
+                border border-pink-500/20
                 z-50
+                overflow-hidden
+                before:absolute before:inset-0 before:bg-gradient-to-br before:from-pink-500/10 before:to-red-500/10 before:-z-10
               `}>
-                <div className={`p-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                {/* Header */}
+                <div className={`
+                  p-4 border-b border-pink-500/20
+                  bg-gradient-to-r from-pink-500/5 to-red-500/5
+                `}>
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Notifications</h3>
-                    <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-pink-500/20 to-red-500/20 flex items-center justify-center">
+                        <FaBell className="text-pink-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">Notifications</h3>
+                        <p className="text-sm text-pink-500/70">LoveConnect Updates</p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs font-bold rounded-full">
                       {unreadCount} new
                     </span>
                   </div>
                 </div>
+
+                {/* Notifications List */}
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.map(notification => (
                     <div
                       key={notification.id}
                       className={`
-                        p-4 border-b ${darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-50'}
-                        transition-colors duration-200 cursor-pointer
-                        ${notification.unread ? (darkMode ? 'bg-gray-700/50' : 'bg-blue-50/50') : ''}
+                        p-4 border-b border-pink-500/10
+                        transition-all duration-300
+                        cursor-pointer
+                        hover:bg-gradient-to-r hover:from-pink-500/5 hover:to-red-500/5
+                        ${notification.unread ? (darkMode ? 'bg-gray-800/50' : 'bg-pink-50/50') : ''}
+                        ${!notification.unread ? 'opacity-70' : ''}
                       `}
                     >
-                      <div className="flex items-start">
-                        <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${notification.unread ? 'bg-blue-500' : 'bg-transparent'}`}></div>
+                      <div className="flex items-start space-x-3">
+                        <div className={`
+                          w-10 h-10 rounded-lg flex items-center justify-center
+                          ${notification.unread
+                            ? 'bg-gradient-to-r from-pink-500/20 to-red-500/20'
+                            : 'bg-gray-500/10'
+                          }
+                        `}>
+                          {notification.icon}
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">{notification.text}</p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
                             {notification.time}
                           </p>
                         </div>
+                        {notification.unread && (
+                          <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mt-2" />
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="p-2 text-center border-t dark:border-gray-700">
+
+                {/* Footer */}
+                <div className="p-3 text-center border-t border-pink-500/20">
                   <a
                     href="#"
-                    className={`block py-2 text-sm ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                    className={`
+                      inline-flex items-center justify-center
+                      px-4 py-2 rounded-lg
+                      bg-gradient-to-r from-pink-500/10 to-red-500/10
+                      hover:from-pink-500/20 hover:to-red-500/20
+                      text-sm font-medium
+                      ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'}
+                      transition-all duration-300
+                    `}
                   >
-                    View all notifications
+                    <span className="flex items-center">
+                      View all notifications
+                      <FiChevronDown className="ml-2" />
+                    </span>
                   </a>
                 </div>
               </div>
@@ -201,78 +336,160 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
           )}
         </div>
 
-        {/* User Profile */}
+        {/* User Profile with premium dropdown */}
         <div className="relative">
           <button
             onClick={() => setProfileOpen(!profileOpen)}
-            className={`flex items-center space-x-2 p-1 pr-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+            className={`
+              flex items-center space-x-2 p-1.5 pr-3 rounded-xl
+              bg-gradient-to-r from-pink-500/10 to-red-500/10
+              hover:from-pink-500/20 hover:to-red-500/20
+              border border-pink-500/20
+              transition-all duration-300
+              hover:scale-105
+              group
+            `}
           >
-            <img
-              src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff"
-              alt="Admin"
-              className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-700"
-            />
+            {/* Animated profile image */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-spin-slow opacity-20 group-hover:opacity-30"></div>
+              <img
+                src="https://ui-avatars.com/api/?name=Love+Admin&background=ec4899&color=fff&bold=true&size=128"
+                alt="Admin"
+                className="w-9 h-9 rounded-full border-2 border-pink-500/30 group-hover:border-pink-500/50 transition-all duration-300"
+              />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+            </div>
+
             {!collapsed && (
               <>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">Admin</p>
-                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Administrator</p>
+                  <p className="text-sm font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                    Love Admin
+                  </p>
+                  <p className={`text-xs ${darkMode ? 'text-pink-400/70' : 'text-pink-600/70'}`}>
+                    Premium Admin
+                  </p>
                 </div>
-                <FiChevronDown className="hidden md:block" />
+                <FiChevronDown className={`
+                  hidden md:block transition-transform duration-300
+                  ${profileOpen ? 'rotate-180' : ''}
+                  ${darkMode ? 'text-pink-400' : 'text-pink-600'}
+                `} />
               </>
             )}
           </button>
 
-          {/* Profile Dropdown */}
+          {/* Premium Profile Dropdown */}
           {profileOpen && (
             <>
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setProfileOpen(false)}
-              ></div>
+              />
               <div className={`
-                absolute right-0 mt-2 w-48
-                ${darkMode ? 'bg-gray-800' : 'bg-white'}
-                rounded-lg shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'}
+                absolute right-0 mt-2 w-64
+                ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'}
+                backdrop-blur-xl
+                rounded-2xl shadow-2xl
+                border border-pink-500/20
                 z-50
+                overflow-hidden
+                before:absolute before:inset-0 before:bg-gradient-to-br before:from-pink-500/10 before:to-red-500/10 before:-z-10
               `}>
-                <div className="p-4 border-b dark:border-gray-700">
+                {/* Profile Header */}
+                <div className={`
+                  p-4 border-b border-pink-500/20
+                  bg-gradient-to-r from-pink-500/5 to-red-500/5
+                `}>
                   <div className="flex items-center space-x-3">
-                    <img
-                      src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff"
-                      alt="Admin"
-                      className="w-10 h-10 rounded-full"
-                    />
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-pulse opacity-20"></div>
+                      <img
+                        src="https://ui-avatars.com/api/?name=Love+Admin&background=ec4899&color=fff&bold=true&size=128"
+                        alt="Admin User"
+                        className="w-12 h-12 rounded-full border-2 border-pink-500/50"
+                      />
+                    </div>
                     <div>
-                      <p className="font-semibold">Admin User</p>
-                      <p className="text-sm opacity-75">admin@example.com</p>
+                      <p className="font-bold text-lg">Mustivibes</p>
+                      <p className="text-sm text-pink-500/70">{adminData.email}</p>
+                      {/* <div className="flex items-center mt-1">
+                        <span className="text-xs px-2 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-full">
+                          ⭐ Premium Admin
+                        </span>
+                      </div> */}
                     </div>
                   </div>
                 </div>
-                <a
-                  href="#"
-                  className={`block px-4 py-3 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                >
-                  <FaUser className="inline mr-2" /> Profile
-                </a>
-                <a
-                  href="#"
-                  className={`block px-4 py-3 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                >
-                  <FaCog className="inline mr-2" /> Settings
-                </a>
-                <div className={`border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}></div>
+
+                {/* Menu Items */}
+                <div className="py-2">
+                  {profileMenu.map((item, index) => (
+                    <a
+                      key={index}
+                      href={item.path}
+                      className={`
+                        flex items-center space-x-3 px-4 py-3
+                        hover:bg-gradient-to-r hover:from-pink-500/10 hover:to-red-500/10
+                        transition-all duration-300
+                        ${darkMode ? 'text-gray-200' : 'text-gray-700'}
+                      `}
+                    >
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                        {item.icon}
+                      </div>
+                      <span className="font-medium">{item.text}</span>
+                    </a>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-pink-500/20" />
+
+                {/* Logout */}
                 <a
                   href="/"
-                  className={`block px-4 py-3 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} text-red-600 dark:text-red-400`}
+                  className={`
+                    flex items-center space-x-3 px-4 py-3
+                    hover:bg-gradient-to-r hover:from-red-500/10 hover:to-pink-500/10
+                    transition-all duration-300
+                    text-red-500
+                  `}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    sessionStorage.removeItem('authToken');
+                    sessionStorage.removeItem('AdminData');
+                    sessionStorage.removeItem('isAdmin');
+                    window.location.href = '/';
+                  }}
                 >
-                  <FaSignOutAlt className="inline mr-2" /> Logout
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-red-500/20 to-pink-500/20 flex items-center justify-center">
+                    <FaSignOutAlt className="text-red-500" />
+                  </div>
+                  <span className="font-bold">Logout</span>
                 </a>
               </div>
             </>
           )}
         </div>
       </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes spin-slow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
     </header>
   );
 };

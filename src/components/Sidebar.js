@@ -20,9 +20,19 @@ import {
   FaDownload,
   FaPlus,
   FaSquare,
-  FaCoins
+  FaCoins,
+  FaHeart,
+  FaFire,
+  FaStar,
+  FaComments,
+  FaUserFriends,
+  FaLock,
+  FaBell,
+  FaUserCircle
 } from 'react-icons/fa';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiHeart, FiMessageSquare, FiUsers as FiUsersIcon } from 'react-icons/fi';
+import { MdFavorite, MdEmojiPeople, MdSecurity } from 'react-icons/md';
+import { TbHeartHandshake, TbMessageReport } from 'react-icons/tb';
 import { useLocation } from 'react-router-dom';
 
 const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollapsed, onNavigate }) => {
@@ -30,29 +40,51 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   const [hoveredItem, setHoveredItem] = useState(null);
   const [activeItem, setActiveItem] = useState('dashboard');
   const [openSubmenus, setOpenSubmenus] = useState({
-    Packages: false,
-    analytics: false,
+    AllRooms: false,
+    CoinsPackages: false,
+    FormsReports: false,
     settings: false
   });
 
-  // Update active item based on route
+  const adminData = JSON.parse(sessionStorage.getItem("AdminData"));
+
+  // Animated floating hearts
+  const [hearts, setHearts] = useState([]);
+
   useEffect(() => {
+    // Update active item based on route
     const path = location.pathname;
     if (path.includes('/users')) setActiveItem('users');
-    else if (path.includes('/packages') || path.includes('/categories') || path.includes('/products')) {
-      setActiveItem('Packages');
-      setOpenSubmenus(prev => ({ ...prev, Packages: true }));
+    else if (path.includes('/allrooms')) {
+      setActiveItem('AllRooms');
+      setOpenSubmenus(prev => ({ ...prev, AllRooms: true }));
     }
-    else if (path.includes('/orders')) setActiveItem('orders');
-    else if (path.includes('/analytics')) {
-      setActiveItem('analytics');
-      setOpenSubmenus(prev => ({ ...prev, analytics: true }));
+    else if (path.includes('/coins')) {
+      setActiveItem('CoinsPackages');
+      setOpenSubmenus(prev => ({ ...prev, CoinsPackages: true }));
+    }
+    else if (path.includes('/payments')) setActiveItem('Payments');
+    else if (path.includes('/complaints') || path.includes('/reports') || path.includes('/warnings') || path.includes('/feedback') || path.includes('/contactus')) {
+      setActiveItem('FormsReports');
+      setOpenSubmenus(prev => ({ ...prev, FormsReports: true }));
     }
     else if (path.includes('/settings')) {
-      setActiveItem('settings');
+      setActiveItem('Settings');
       setOpenSubmenus(prev => ({ ...prev, settings: true }));
     }
     else setActiveItem('dashboard');
+
+    // Create floating hearts
+    const heartsArray = Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 8 + 6,
+      speed: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.2 + 0.1,
+      delay: Math.random() * 2
+    }));
+    setHearts(heartsArray);
   }, [location]);
 
   const toggleSubmenu = (menu) => {
@@ -64,43 +96,70 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   };
 
   const menuItems = [
-    { id: 'dashboard', icon: <FaTachometerAlt />, text: 'Dashboard', path: '/' },
-    { id: 'users', icon: <FaUsers />, text: 'Users', path: '/users' },
+    { 
+      id: 'dashboard', 
+      icon: <FaTachometerAlt />, 
+      text: 'Dashboard', 
+      path: '/' 
+    },
+    { 
+      id: 'users', 
+      icon: <FiUsersIcon className="text-xl" />, 
+      text: 'Users Management', 
+      path: '/users' 
+    },
     {
       id: 'AllRooms',
-      icon: <FaSquare />,
-      text: 'AllRooms',
+      icon: <FaComments />,
+      text: 'Chat Rooms',
       path: '/allrooms',
       subItems: [
-        { id: 'All Rooms', text: 'All Rooms', path: '/allrooms' }
+        { id: 'Create Rooms', text: 'Create Chat Rooms', path: '/chatrooms' },
+        { id: 'All Rooms', text: 'All Chat Rooms', path: '/allrooms' }
       ]
     },
     {
-      id: 'Coins Packages',
+      id: 'CoinsPackages',
       icon: <FaCoins />,
-      text: 'Coins Packages',
+      text: 'Premium Features',
       path: '/coins-packages',
       subItems: [
-        { id: 'Coins Packages', text: 'Create Coins Packages', path: '/create-coin-package' },
-        { id: 'Coins Packages', text: 'Coins Packages', path: '/all-coin-packages' },
-        { id: 'Coins Prices', text: 'Coins Prices', path: '/coins-prices' }
+        { id: 'Coins Packages', text: 'Coin Packages', path: '/all-coin-packages' },
+        { id: 'Coins Prices', text: 'Pricing Plans', path: '/coins-prices' },
+        { id: 'Referal COnfig', text: 'Referal COnfiguration', path: '/referal' },
       ]
     },
-    { id: 'Payments', icon: <FaFileInvoiceDollar />, text: 'Payments', path: '/all-payments' },
+    { 
+      id: 'Payments', 
+      icon: <FaFileInvoiceDollar />, 
+      text: 'Payments', 
+      path: '/all-payments' 
+    },
     {
-      id: 'Forms&Reports',
-      icon: <FaRegQuestionCircle />,
-      text: 'Forms & Reports',
+      id: 'FormsReports',
+      icon: <TbMessageReport className="text-xl" />,
+      text: 'Community Safety',
       path: '/forms-reports',
       subItems: [
-        { id: 'Complaints', text: 'All Complaints', path: '/complaints' },
-        { id: 'Reports', text: 'All Reports', path: '/reports' },
-        { id: 'Warnings', text: 'All Warnings', path: '/warnings' },
-        { id: 'Feedback', text: 'All Feedback', path: '/feedback' },
-        { id: 'Contact', text: 'All Contact', path: '/contactus' }
+        { id: 'Complaints', text: 'User Complaints', path: '/complaints' },
+        { id: 'Reports', text: 'Profile Reports', path: '/reports' },
+        { id: 'Warnings', text: 'User Warnings', path: '/warnings' },
+        { id: 'Feedback', text: 'App Feedback', path: '/feedback' },
+        { id: 'Contact', text: 'Contact Us', path: '/contactus' }
       ]
     },
-    { id: 'Settings', icon: <FaCog />, text: 'Settings', path: '/settings' },
+    { 
+      id: 'Notifications', 
+      icon: <FaBell />, 
+      text: 'Notifications', 
+      path: '/notifications' 
+    },
+    { 
+      id: 'Settings', 
+      icon: <MdSecurity className="text-xl" />, 
+      text: 'Security & Settings', 
+      path: '/settings' 
+    },
   ];
 
   const handleItemClick = (item) => {
@@ -119,23 +178,18 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   const handleSubItemClick = (subItem, parentId) => {
     onNavigate(subItem.path);
     setActiveItem(subItem.id);
-
-    // When in collapsed mode, close sidebar after navigation on mobile
     if (window.innerWidth < 768) {
       toggleSidebar();
     }
   };
 
   const handleLogout = () => {
-    // Handle logout logic here
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('AdminData');
     sessionStorage.removeItem('isAdmin');
-
     window.location.href = '/';
   };
 
-  // Check if a subitem is active
   const isSubItemActive = (parentId, subItems) => {
     return subItems?.some(subItem => {
       const path = location.pathname;
@@ -145,244 +199,352 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay with gradient */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-gradient-to-r from-pink-900/70 to-red-900/70 backdrop-blur-sm z-30 md:hidden"
           onClick={toggleSidebar}
         ></div>
       )}
 
-      {/* Sidebar */}
+      {/* Animated floating hearts */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {hearts.map(heart => (
+          <div
+            key={heart.id}
+            className="absolute text-pink-400/20"
+            style={{
+              left: `${heart.x}%`,
+              top: `${heart.y}%`,
+              fontSize: `${heart.size}px`,
+              animation: `floatHeart ${heart.speed + 3}s ease-in-out ${heart.delay}s infinite alternate`,
+              opacity: heart.opacity
+            }}
+          >
+            <FiHeart />
+          </div>
+        ))}
+      </div>
+
+      {/* Sidebar Container */}
       <aside className={`
-        ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}
+        ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'}
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        ${collapsed ? 'md:w-20' : 'md:w-64'}
+        ${collapsed ? 'md:w-20' : 'md:w-72'}
         fixed md:relative z-40
         h-screen
         transition-all duration-300 ease-in-out
         flex flex-col
-        border-r ${darkMode ? 'border-gray-700' : 'border-gray-200'}
-        shadow-lg md:shadow-sm
+        backdrop-blur-xl
+        border-r border-pink-500/20
+        shadow-2xl
       `}>
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-pink-500/5 via-red-500/5 to-transparent pointer-events-none" />
+
         {/* Header */}
         <div className={`
-          p-4 ${darkMode ? 'border-gray-700' : 'border-gray-200'} 
+          p-4 border-b border-pink-500/20
           flex items-center ${collapsed ? 'justify-center' : 'justify-between'}
-          border-b
+          relative z-10
         `}>
           {/* Logo */}
           {!collapsed ? (
-            <div className="flex items-center cursor-pointer" onClick={() => onNavigate('/')}>
-              <div className="w-8 h-8  rounded-lg flex items-center justify-center mr-3 overflow-hidden">
-                <img
-                  src="/logo.png"   // or your logo path
-                  alt="Logo"
-                  className="w-8 h-8 object-contain rounded-lg"
-                />
+            <div 
+              className="flex items-center cursor-pointer group" 
+              onClick={() => onNavigate('/')}
+            >
+              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-red-500 rounded-xl flex items-center justify-center mr-3 overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300">
+                <img src="/logo.png" className='img-fluid' />
               </div>
-
               <div>
-                <h1 className="text-xl font-bold">Mustivibes</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                  Mustivibes
+                </h1>
+                <p className="text-xs text-pink-400/70 font-medium">Admin Suite</p>
               </div>
             </div>
           ) : (
             <div
-              className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 bg-gradient-to-r from-pink-500 to-red-500 rounded-xl flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 transition-transform duration-300"
               onClick={() => onNavigate('/')}
             >
-              <span className="text-white font-bold">A</span>
+              <FaHeart className="text-white text-lg" />
             </div>
           )}
 
           {/* Close Button (Mobile only) */}
           <button
             onClick={toggleSidebar}
-            className={`md:hidden p-1 rounded ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} ${collapsed ? 'hidden' : ''}`}
+            className={`md:hidden p-2 rounded-lg bg-gradient-to-r from-pink-500/10 to-red-500/10 hover:from-pink-500/20 hover:to-red-500/20 ${collapsed ? 'hidden' : ''}`}
             aria-label="Close sidebar"
           >
-            <FaTimes className="text-lg" />
+            <FaTimes className="text-lg text-pink-500" />
           </button>
 
           {/* Collapse Toggle Button (Desktop only) */}
           <button
             onClick={toggleCollapsed}
-            className={`hidden md:flex p-1 rounded ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} ${collapsed ? 'absolute -right-3 top-6 bg-white dark:bg-gray-800 border shadow-lg' : ''}`}
+            className={`hidden md:flex p-2 rounded-lg bg-gradient-to-r from-pink-500/10 to-red-500/10 hover:from-pink-500/20 hover:to-red-500/20 transition-all duration-300 ${collapsed ? 'absolute -right-3 top-6 bg-white border-2 border-pink-500/30 shadow-lg' : ''}`}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
-              <FiChevronRight className="text-lg" />
+              <FiChevronRight className="text-lg text-pink-500" />
             ) : (
-              <FiChevronLeft className="text-lg" />
+              <FiChevronLeft className="text-lg text-pink-500" />
             )}
           </button>
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 p-2 md:p-4 overflow-y-auto">
+        <nav className="flex-1 p-2 md:p-4 overflow-y-auto relative z-10">
           <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                {/* Main Menu Item */}
-                <div>
-                  <button
-                    onClick={() => handleItemClick(item)}
-                    className={`
-                      w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} 
-                      p-3 rounded-lg transition-all duration-200
-                      ${activeItem === item.id || isSubItemActive(item.id, item.subItems)
-                        ? `${darkMode ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'}`
-                        : `${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`
-                      }
-                      ${collapsed ? 'relative' : ''}
-                    `}
-                    onMouseEnter={() => collapsed && setHoveredItem(item.id)}
-                    onMouseLeave={() => collapsed && setHoveredItem(null)}
-                  >
-                    <div className="flex items-center">
-                      <span className={`${collapsed ? 'text-xl' : 'text-lg'}`}>{item.icon}</span>
+            {menuItems.map((item) => {
+              const isActive = activeItem === item.id || isSubItemActive(item.id, item.subItems);
+              const isSubmenuOpen = openSubmenus[item.id];
+              
+              return (
+                <li key={item.id}>
+                  {/* Main Menu Item */}
+                  <div>
+                    <button
+                      onClick={() => handleItemClick(item)}
+                      className={`
+                        w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} 
+                        p-3 rounded-xl transition-all duration-300
+                        ${isActive
+                          ? 'bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/30 shadow-lg'
+                          : `${darkMode ? 'hover:bg-pink-500/10' : 'hover:bg-pink-500/5'} hover:border hover:border-pink-500/20`
+                        }
+                        ${collapsed ? 'relative group' : ''}
+                        backdrop-blur-sm
+                        border ${isActive ? 'border-pink-500/40' : 'border-transparent'}
+                        hover:shadow-md
+                      `}
+                      onMouseEnter={() => collapsed && setHoveredItem(item.id)}
+                      onMouseLeave={() => collapsed && setHoveredItem(null)}
+                    >
+                      <div className="flex items-center">
+                        <span className={`
+                          ${isActive ? 'text-pink-500' : darkMode ? 'text-gray-300' : 'text-gray-600'}
+                          ${collapsed ? 'text-xl' : 'text-lg'}
+                          transition-colors duration-300
+                        `}>
+                          {item.icon}
+                        </span>
 
-                      {/* Text - hidden when collapsed */}
+                        {/* Text - hidden when collapsed */}
+                        {!collapsed && (
+                          <span className={`
+                            ml-3 font-medium
+                            ${isActive ? 'text-pink-500' : darkMode ? 'text-gray-200' : 'text-gray-700'}
+                          `}>
+                            {item.text}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Submenu arrow and active indicator */}
                       {!collapsed && (
-                        <span className="ml-3 font-medium">{item.text}</span>
+                        <div className="flex items-center gap-2">
+                          {item.subItems && (
+                            <span className={`text-xs transition-transform duration-300 ${isSubmenuOpen ? 'rotate-180' : ''}`}>
+                              <FaChevronDown />
+                            </span>
+                          )}
+                          {isActive && (
+                            <span className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-pulse"></span>
+                          )}
+                        </div>
                       )}
-                    </div>
 
-                    {/* Submenu arrow (only when not collapsed) */}
-                    {!collapsed && item.subItems && (
-                      <span className="text-xs ml-2">
-                        {openSubmenus[item.id] ? <FaChevronDown /> : <FaChevronRight />}
-                      </span>
-                    )}
+                      {/* Tooltip for collapsed state */}
+                      {collapsed && hoveredItem === item.id && (
+                        <div className={`
+                          absolute left-full ml-2 px-3 py-2 rounded-lg shadow-xl z-50
+                          bg-gradient-to-r from-pink-500 to-red-500
+                          text-white text-sm font-medium
+                          whitespace-nowrap
+                          before:absolute before:left-[-6px] before:top-1/2 before:-translate-y-1/2
+                          before:border-t-4 before:border-b-4 before:border-r-4
+                          before:border-t-transparent before:border-b-transparent before:border-r-pink-500
+                        `}>
+                          {item.text}
+                          {isActive && (
+                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full"></div>
+                          )}
+                        </div>
+                      )}
+                    </button>
 
-                    {/* Active indicator */}
-                    {(activeItem === item.id || isSubItemActive(item.id, item.subItems)) && !collapsed && (
-                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                    )}
+                    {/* Sub-items with animated reveal */}
+                    {!collapsed && item.subItems && isSubmenuOpen && (
+                      <div className="mt-1 ml-8 pl-4 border-l-2 border-gradient-to-b from-pink-500/30 to-transparent space-y-1 animate-fadeIn">
+                        {item.subItems.map((subItem) => {
+                          const isSubActive = location.pathname === subItem.path ||
+                            location.pathname.includes(subItem.path.split('/')[1]);
 
-                    {/* Tooltip for collapsed state */}
-                    {collapsed && hoveredItem === item.id && (
-                      <div className={`
-                        absolute left-full ml-2 px-3 py-2 rounded-md shadow-lg z-50
-                        ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}
-                        whitespace-nowrap
-                      `}>
-                        {item.text}
+                          return (
+                            <button
+                              key={subItem.id}
+                              onClick={() => handleSubItemClick(subItem, item.id)}
+                              className={`
+                                w-full flex items-center justify-start p-2.5 rounded-lg 
+                                transition-all duration-300 text-sm group
+                                ${isSubActive
+                                  ? 'bg-gradient-to-r from-pink-500/15 to-red-500/15 text-pink-500 font-semibold'
+                                  : `${darkMode ? 'hover:bg-pink-500/10 text-gray-300' : 'hover:bg-pink-500/5 text-gray-600'}`
+                                }
+                                hover:translate-x-1
+                              `}
+                            >
+                              <span className={`
+                                mr-2 transition-all duration-300
+                                ${isSubActive ? 'text-pink-500 text-base' : 'text-pink-500/50'}
+                                group-hover:text-pink-500
+                              `}>
+                                •
+                              </span>
+                              {subItem.text}
+                              {isSubActive && (
+                                <span className="ml-auto w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-pulse"></span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
-                  </button>
-
-                  {/* Sub-items (only when not collapsed and menu is open) */}
-                  {!collapsed && item.subItems && openSubmenus[item.id] && (
-                    <div className="mt-1 ml-6 pl-3 border-l-2 border-gray-200 dark:border-gray-700 space-y-1">
-                      {item.subItems.map((subItem) => {
-                        const isActive = location.pathname === subItem.path ||
-                          location.pathname.includes(subItem.path.split('/')[1]);
-
-                        return (
-                          <button
-                            key={subItem.id}
-                            onClick={() => handleSubItemClick(subItem, item.id)}
-                            className={`
-                              w-full flex items-center justify-start p-2 rounded-lg 
-                              transition-all duration-200 text-sm
-                              ${isActive
-                                ? `${darkMode ? 'bg-gray-700 text-blue-400' : 'bg-gray-100 text-blue-600'} font-medium`
-                                : `${darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`
-                              }
-                            `}
-                          >
-                            <span className="mr-2">•</span>
-                            {subItem.text}
-                            {isActive && (
-                              <span className="ml-auto w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
-          {/* Divider */}
-          <div className={`my-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}></div>
+          {/* Divider with gradient */}
+          <div className="my-4 relative">
+            <div className="h-px bg-gradient-to-r from-transparent via-pink-500/30 to-transparent"></div>
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-2">
+              <FiHeart className="text-pink-500/50" />
+            </div>
+          </div>
 
-          {/* Logout */}
-          <div className="relative">
+          {/* Support & Logout */}
+          <div className="space-y-1">
             <button
-              onClick={handleLogout}
               className={`
                 w-full flex items-center ${collapsed ? 'justify-center' : 'justify-start'} 
-                p-3 rounded-lg transition-all duration-200
-                ${darkMode ? 'hover:bg-gray-700 text-red-400' : 'hover:bg-gray-100 text-red-600'}
-                ${collapsed ? 'relative' : ''}
+                p-3 rounded-xl transition-all duration-300
+                ${darkMode ? 'hover:bg-pink-500/10 text-pink-400' : 'hover:bg-pink-500/5 text-pink-600'}
+                ${collapsed ? 'relative group' : ''}
+                backdrop-blur-sm
+                hover:border hover:border-pink-500/20
               `}
-              onMouseEnter={() => collapsed && setHoveredItem('logout')}
+              onMouseEnter={() => collapsed && setHoveredItem('support')}
               onMouseLeave={() => collapsed && setHoveredItem(null)}
             >
-              <FaSignOutAlt className={`${collapsed ? 'text-xl' : 'text-lg'}`} />
-              {!collapsed && <span className="ml-3 font-medium">Logout</span>}
-
-              {/* Tooltip for collapsed state */}
-              {collapsed && hoveredItem === 'logout' && (
+              <FaLifeRing className={`${collapsed ? 'text-xl' : 'text-lg'}`} />
+              {!collapsed && <span className="ml-3 font-medium">Support</span>}
+              
+              {collapsed && hoveredItem === 'support' && (
                 <div className={`
-                  absolute left-full ml-2 px-3 py-2 rounded-md shadow-lg z-50
-                  ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}
+                  absolute left-full ml-2 px-3 py-2 rounded-lg shadow-xl z-50
+                  bg-gradient-to-r from-pink-500 to-red-500
+                  text-white text-sm font-medium
                   whitespace-nowrap
                 `}>
-                  Logout
+                  Support
                 </div>
               )}
             </button>
+
+            {/* Logout */}
+            <div className="relative">
+              <button
+                onClick={handleLogout}
+                className={`
+                  w-full flex items-center ${collapsed ? 'justify-center' : 'justify-start'} 
+                  p-3 rounded-xl transition-all duration-300
+                  ${darkMode ? 'hover:bg-red-500/10 text-red-400' : 'hover:bg-red-500/5 text-red-600'}
+                  ${collapsed ? 'relative group' : ''}
+                  backdrop-blur-sm
+                  hover:border hover:border-red-500/20
+                `}
+                onMouseEnter={() => collapsed && setHoveredItem('logout')}
+                onMouseLeave={() => collapsed && setHoveredItem(null)}
+              >
+                <FaSignOutAlt className={`${collapsed ? 'text-xl' : 'text-lg'}`} />
+                {!collapsed && <span className="ml-3 font-medium">Logout</span>}
+
+                {collapsed && hoveredItem === 'logout' && (
+                  <div className={`
+                    absolute left-full ml-2 px-3 py-2 rounded-lg shadow-xl z-50
+                    bg-gradient-to-r from-red-500 to-pink-500
+                    text-white text-sm font-medium
+                    whitespace-nowrap
+                  `}>
+                    Logout
+                  </div>
+                )}
+              </button>
+            </div>
           </div>
         </nav>
 
         {/* User Profile */}
         <div className={`
-          p-3 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}
+          p-4 border-t border-pink-500/20
           ${collapsed ? 'text-center' : ''}
+          relative z-10
         `}>
           {collapsed ? (
-            <div className="relative">
-              <img
-                src="https://ui-avatars.com/api/?name=AU&background=3b82f6&color=fff"
-                alt="Admin"
-                className="w-10 h-10 rounded-full mx-auto cursor-pointer"
-                onMouseEnter={() => setHoveredItem('profile')}
-                onMouseLeave={() => setHoveredItem(null)}
-                onClick={() => onNavigate('/profile')}
-              />
-              <div className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-1/2 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+            <div className="relative group">
+              <div className="w-12 h-12 mx-auto relative cursor-pointer" onClick={() => onNavigate('/profile')}>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-spin-slow"></div>
+                <img
+                  src="https://ui-avatars.com/api/?name=AU&background=ec4899&color=fff&bold=true"
+                  alt="Admin"
+                  className="w-11 h-11 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-2 border-gray-900"
+                  onMouseEnter={() => setHoveredItem('profile')}
+                  onMouseLeave={() => setHoveredItem(null)}
+                />
+                <div className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-1/2 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+              </div>
 
               {/* Profile tooltip */}
               {hoveredItem === 'profile' && (
                 <div className={`
-                  absolute left-full bottom-0 ml-2 px-3 py-2 rounded-md shadow-lg z-50
-                  ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}
+                  absolute left-full bottom-0 ml-2 px-3 py-2 rounded-lg shadow-xl z-50
+                  bg-gradient-to-r from-pink-500 to-red-500
+                  text-white
                   whitespace-nowrap
                 `}>
-                  <div className="text-sm font-medium">Admin User</div>
-                  <div className="text-xs opacity-75">admin@example.com</div>
+                  <div className="text-sm font-semibold">Love Admin</div>
+                  <div className="text-xs opacity-90">admin@loveconnect.com</div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex items-center cursor-pointer" onClick={() => onNavigate('/profile')}>
+            <div 
+              className="flex items-center cursor-pointer group" 
+              onClick={() => onNavigate('/profile')}
+            >
               <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-pulse opacity-20 group-hover:opacity-30"></div>
                 <img
-                  src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff"
+                  src="https://ui-avatars.com/api/?name=M&background=ec4899&color=fff&bold=true&size=128"
                   alt="Admin User"
-                  className="w-10 h-10 rounded-full"
+                  className="w-12 h-12 rounded-full relative border-2 border-pink-500/30 group-hover:border-pink-500/50 transition-all duration-300"
                 />
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
               </div>
               <div className="ml-3">
-                <h4 className="font-semibold text-sm">Admin User</h4>
-                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>admin@example.com</p>
+                <h4 className="font-semibold text-sm bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                  Mustivibes
+                </h4>
+                <p className={`text-xs ${darkMode ? 'text-pink-400/70' : 'text-pink-600/70'}`}>
+                  {adminData.email}
+                </p>
               </div>
             </div>
           )}
@@ -393,12 +555,58 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
       {!sidebarOpen && (
         <button
           onClick={toggleSidebar}
-          className="fixed bottom-4 left-4 md:hidden z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-105"
+          className="fixed bottom-6 left-6 md:hidden z-50 bg-gradient-to-r from-pink-500 to-red-500 text-white p-4 rounded-full shadow-2xl hover:shadow-pink-500/30 hover:scale-110 transition-all duration-300 group"
           aria-label="Open menu"
         >
           <FaBars className="text-xl" />
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-lg">
+            ♥
+          </div>
         </button>
       )}
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes floatHeart {
+          0%, 100% {
+            transform: translateY(0) translateX(0) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-20px) translateX(10px) rotate(10deg);
+          }
+          66% {
+            transform: translateY(-10px) translateX(-10px) rotate(-10deg);
+          }
+        }
+        
+        @keyframes spin-slow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };

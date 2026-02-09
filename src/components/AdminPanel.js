@@ -5,7 +5,6 @@ import Navbar from './Navbar';
 import Dashboard from '../Views/Dashboard';
 import Users from '../Views/users/Users';
 import AllRooms from '../Views/rooms/AllRooms';
-import CreateCoinPackage from '../Views/coinPackages/CreateCainPackage';
 import AllCoinPackages from '../Views/coinPackages/AllCoinPackages';
 import CoinPrices from '../Views/coinPackages/CoinPrices';
 import Settings from '../Views/Settings';
@@ -15,6 +14,9 @@ import Reports from '../Views/formsAndReports/Reports';
 import Warnings from '../Views/formsAndReports/Warnings';
 import Feedback from '../Views/formsAndReports/Feedback';
 import ContactUs from '../Views/formsAndReports/ContactUs'
+import SingleUser from '../Views/users/SingleUser';
+import CreateRoom from '../Views/rooms/CreateRoom';
+import ReferralConfig from '../Views/coinPackages/ReferalConfig';
 
 const AdminPanel = () => {
     const navigate = useNavigate();
@@ -69,69 +71,78 @@ const AdminPanel = () => {
         setDarkMode(savedDarkMode);
     }, []);
 
-    return (
-        <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-            <div className="flex">
-                {/* Sidebar */}
-                <Sidebar
-                    sidebarOpen={sidebarOpen}
-                    darkMode={darkMode}
-                    toggleSidebar={toggleSidebar}
-                    collapsed={collapsed}
-                    toggleCollapsed={toggleCollapsed}
-                    onNavigate={handleNavigation}
-                />
+  return (
+  <div
+    className={`
+      h-screen overflow-hidden
+      ${darkMode ? "dark bg-gray-900" : "bg-gray-50"}
+    `}
+  >
+    <div className="flex h-full">
 
-                {/* Main Content Area */}
-                <div className={`
-                    flex-1 flex flex-col 
-                    transition-all duration-300 ease-in-out
-                    ${sidebarOpen ? 'md:ml-0' : 'md:ml-0'}
-                `}>
-                    {/* Navbar */}
-                    <Navbar
-                        toggleSidebar={toggleSidebar}
-                        toggleDarkMode={toggleDarkMode}
-                        darkMode={darkMode}
-                        collapsed={collapsed}
-                        sidebarOpen={sidebarOpen}
-                        onNavigate={handleNavigation}
-                    />
+      {/* Sidebar */}
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        darkMode={darkMode}
+        toggleSidebar={toggleSidebar}
+        collapsed={collapsed}
+        toggleCollapsed={toggleCollapsed}
+        onNavigate={handleNavigation}
+      />
 
-                    {/* Main Content Area with Routes */}
-                    <main className={`
-                        flex-1 p-4 md:p-6 overflow-y-auto
-                        transition-all duration-300
-                    `}>
-                        <Routes>
-                            <Route path="/" element={<Dashboard darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path="/dashboard" element={<Dashboard darkMode={darkMode} collapsed={collapsed} />} />
+      {/* RIGHT SIDE */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
 
-                            <Route path="/users" element={<Users darkMode={darkMode} collapsed={collapsed} />} />
+        {/* Navbar */}
+        <Navbar
+          toggleSidebar={toggleSidebar}
+          toggleDarkMode={toggleDarkMode}
+          darkMode={darkMode}
+          collapsed={collapsed}
+          sidebarOpen={sidebarOpen}
+          onNavigate={handleNavigation}
+        />
 
-                            <Route path="/allrooms" element={<AllRooms darkMode={darkMode} collapsed={collapsed} />} />
+        {/* ✅ ONLY THIS SCROLLS */}
+        <main
+          className="
+            flex-1
+            overflow-y-auto
+            overflow-x-hidden
+            p-4 md:p-6
+          "
+        >
+          <Routes>
+            <Route path="/" element={<Dashboard darkMode={darkMode} />} />
+            <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
 
-                            <Route path="/create-coin-packages" element={<CreateCoinPackage darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path="/all-coin-packages" element={<AllCoinPackages darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path="/coins-prices" element={<CoinPrices darkMode={darkMode} collapsed={collapsed} />} />
+            <Route path="/users" element={<Users darkMode={darkMode} />} />
+            <Route path="/user/:id" element={<SingleUser darkMode={darkMode} />} />
 
-                            <Route path="/all-payments" element={<AllPayments darkMode={darkMode} collapsed={collapsed} />} />
+            <Route path="/allrooms" element={<AllRooms darkMode={darkMode} />} />
+            <Route path="/chatrooms" element={<CreateRoom darkMode={darkMode} />} />
 
-                            <Route path='/complaints' element={<Complaints darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path='/reports' element={<Reports darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path='/warnings' element={<Warnings darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path='/feedback' element={<Feedback darkMode={darkMode} collapsed={collapsed} />} />
-                            <Route path='/contactus' element={<ContactUs darkMode={darkMode} collapsed={collapsed} />} />
+            <Route path="/all-coin-packages" element={<AllCoinPackages darkMode={darkMode} />} />
+            <Route path="/coins-prices" element={<CoinPrices darkMode={darkMode} />} />
+            <Route path="/referal" element={<ReferralConfig darkMode={darkMode} />} />
 
-                            <Route path="/settings" element={<Settings darkMode={darkMode} collapsed={collapsed} />} />
+            <Route path="/all-payments" element={<AllPayments darkMode={darkMode} />} />
 
-                            <Route path="*" element={<Navigate to="/admin" replace />} />
-                        </Routes>
-                    </main>
-                </div>
-            </div>
-        </div>
-    );
+            <Route path='/complaints' element={<Complaints darkMode={darkMode} />} />
+            <Route path='/reports' element={<Reports darkMode={darkMode} />} />
+            <Route path='/warnings' element={<Warnings darkMode={darkMode} />} />
+            <Route path='/feedback' element={<Feedback darkMode={darkMode} />} />
+            <Route path='/contactus' element={<ContactUs darkMode={darkMode} />} />
+
+            <Route path="/settings" element={<Settings darkMode={darkMode} />} />
+
+            <Route path="*" element={<Navigate to="/admin" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </div>
+  </div>
+);
 };
 
 export default AdminPanel;

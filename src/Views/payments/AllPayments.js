@@ -10,7 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const API = "http://31.97.206.144:4055/api/get/payments";
+const API = "http://31.97.206.144:4050/api/get/payments";
 
 const AllPayments = ({ darkMode }) => {
   const isDark = darkMode;
@@ -22,24 +22,37 @@ const AllPayments = ({ darkMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // pagination
   const [page, setPage] = useState(1);
   const rowsPerPage = 8;
 
-  // 🎨 Theme
-  const colors = {
-    bg: isDark ? "bg-slate-950" : "bg-slate-100",
-    card: isDark ? "bg-slate-900" : "bg-white",
-    border: isDark ? "border-slate-800" : "border-slate-200",
-    text: isDark ? "text-slate-100" : "text-slate-800",
+  /* ================= PREMIUM THEME ================= */
+
+  const theme = {
+    page: isDark
+      ? "bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] text-white"
+      : "bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900",
+
+    card: isDark
+      ? "bg-white/[0.04] border border-white/10 backdrop-blur-xl"
+      : "bg-white border border-slate-200",
+
+    hover: isDark
+      ? "hover:bg-white/[0.07]"
+      : "hover:bg-slate-50",
+
     sub: isDark ? "text-slate-400" : "text-slate-500",
+
     input: isDark
-      ? "bg-slate-950 border-slate-700 text-white"
+      ? "bg-slate-900 border-slate-700 text-white placeholder-slate-500"
       : "bg-white border-slate-300",
-    hover: isDark ? "hover:bg-slate-800/60" : "hover:bg-slate-50",
+
+    tableHead: isDark
+      ? "bg-white/[0.03]"
+      : "bg-slate-50",
   };
 
-  // fetch
+  /* ================= FETCH ================= */
+
   const fetchPayments = async () => {
     try {
       setLoading(true);
@@ -56,26 +69,24 @@ const AllPayments = ({ darkMode }) => {
     fetchPayments();
   }, []);
 
-  // filtering
+  /* ================= FILTER ================= */
+
   const filtered = useMemo(() => {
     return payments
-      .filter((p) =>
-        status === "all" ? true : p.status === status
-      )
+      .filter((p) => (status === "all" ? true : p.status === status))
       .filter((p) => {
-        const text = search.toLowerCase();
+        const t = search.toLowerCase();
 
         return (
-          p.userId?.name?.toLowerCase().includes(text) ||
-          p.userId?.mobile?.includes(text) ||
-          p.razorpayPaymentId?.toLowerCase().includes(text)
+          p.userId?.name?.toLowerCase().includes(t) ||
+          p.userId?.mobile?.includes(t) ||
+          p.razorpayPaymentId?.toLowerCase().includes(t)
         );
       });
   }, [payments, search, status]);
 
   useEffect(() => setPage(1), [search, status]);
 
-  // pagination
   const totalPages = Math.ceil(filtered.length / rowsPerPage);
 
   const paginated = useMemo(() => {
@@ -83,7 +94,8 @@ const AllPayments = ({ darkMode }) => {
     return filtered.slice(start, start + rowsPerPage);
   }, [filtered, page]);
 
-  // 📊 STATS
+  /* ================= STATS ================= */
+
   const stats = useMemo(() => {
     const revenue = payments
       .filter((p) => p.status === "completed")
@@ -100,220 +112,280 @@ const AllPayments = ({ darkMode }) => {
     };
   }, [payments]);
 
+  /* ================= BADGE ================= */
+
   const statusBadge = (s) => {
     if (s === "completed")
-      return "bg-green-100 text-green-700";
-    if (s === "created")
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
 
-    return "bg-slate-200 text-slate-600";
+    if (s === "created")
+      return "bg-amber-500/15 text-amber-400 border border-amber-500/30";
+
+    return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
   };
 
+  /* ================================================= */
+
   return (
-    <div className={`${colors.bg} min-h-screen p-6`}>
-      {/* HEADER */}
-      <div className="flex justify-between flex-wrap gap-4 mb-7">
-        <div>
-          <h1 className={`text-2xl font-bold ${colors.text}`}>
-            Payments Dashboard
-          </h1>
-          <p className={colors.sub}>
-            Track transactions and revenue
-          </p>
+    <div className={`${theme.page} min-h-screen p-4 md:p-8`}>
+      <div className="max-w-7xl mx-auto space-y-8">
+
+        {/* HEADER */}
+
+        <div className="flex flex-wrap justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Payments Dashboard
+            </h1>
+            <p className={theme.sub}>
+              Monitor revenue, transactions and coin sales
+            </p>
+          </div>
+
+          <button
+            onClick={fetchPayments}
+            className="
+              flex items-center gap-2
+              px-4 py-2 rounded-xl
+              bg-gradient-to-r from-indigo-600 to-blue-600
+              hover:scale-105 active:scale-95
+              transition
+              text-white shadow-lg
+            "
+          >
+            <RefreshCcw size={16} />
+            Refresh
+          </button>
         </div>
 
-        <button
-          onClick={fetchPayments}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"
-        >
-          <RefreshCcw size={16} />
-          Refresh
-        </button>
-      </div>
+        {/* PREMIUM STATS */}
 
-      {/* 🔥 STATS */}
-      <div className="grid md:grid-cols-3 gap-6 mb-6">
-        {[
-          {
-            label: "Total Revenue",
-            value: `₹ ${stats.revenue}`,
-            icon: <IndianRupee />,
-          },
-          {
-            label: "Coins Sold",
-            value: stats.coins,
-            icon: <Coins />,
-          },
-          {
-            label: "Total Payments",
-            value: stats.total,
-            icon: <CreditCard />,
-          },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className={`${colors.card} ${colors.border} border rounded-2xl p-5 shadow-sm`}
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className={colors.sub}>{card.label}</p>
-                <h2
-                  className={`text-2xl font-bold mt-1 ${colors.text}`}
-                >
-                  {card.value}
-                </h2>
-              </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StatCard
+            label="Total Revenue"
+            value={`₹ ${stats.revenue.toLocaleString("en-IN")}`}
+            icon={<IndianRupee />}
+            isDark={isDark}
+          />
 
-              <div className="p-3 rounded-xl bg-blue-600 text-white">
-                {card.icon}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          <StatCard
+            label="Coins Sold"
+            value={stats.coins}
+            icon={<Coins />}
+            isDark={isDark}
+          />
 
-      {/* TABLE CARD */}
-      <div
-        className={`${colors.card} ${colors.border} border rounded-2xl shadow-sm`}
-      >
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-          <div className="relative">
-            <Search
-              size={18}
-              className="absolute top-2.5 left-3 text-slate-400"
-            />
-            <input
-              placeholder="Search payments..."
-              className={`pl-10 pr-4 py-2 rounded-lg border ${colors.input}`}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <select
-            className={`px-3 py-2 rounded-lg border ${colors.input}`}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="all">All Status</option>
-            <option value="completed">Completed</option>
-            <option value="created">Created</option>
-          </select>
+          <StatCard
+            label="Total Payments"
+            value={stats.total}
+            icon={<CreditCard />}
+            isDark={isDark}
+          />
         </div>
 
         {/* TABLE */}
-        {loading ? (
-          <div className="p-10 text-center text-slate-400">
-            Loading payments...
+
+        <div className={`rounded-3xl shadow-xl ${theme.card}`}>
+
+          {/* FILTER BAR */}
+
+          <div className="flex flex-wrap gap-3 justify-between p-5 border-b border-white/10">
+
+            <div className="relative">
+              <Search
+                size={18}
+                className="absolute top-3 left-3 text-slate-400"
+              />
+
+              <input
+                placeholder="Search payments..."
+                className={`pl-10 pr-4 py-2 rounded-xl border ${theme.input}`}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <select
+              className={`px-3 py-2 rounded-xl border ${theme.input}`}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="all">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="created">Created</option>
+            </select>
           </div>
-        ) : error ? (
-          <div className="p-10 text-center text-red-500">
-            {error}
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400">
-                  <tr>
-                    <th className="p-4 text-left">User</th>
-                    <th>Payment ID</th>
-                    <th>Amount</th>
-                    <th>Coins</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
 
-                <tbody>
-                  {paginated.map((p) => (
-                    <tr
-                      key={p._id}
-                      className={`${colors.hover} border-t ${colors.border}`}
-                    >
-                      <td className="p-4">
-                        {p.userId ? (
-                          <>
-                            <p className={`font-semibold ${colors.text}`}>
-                              {p.userId.name}
-                            </p>
-                            <p className={colors.sub}>
-                              {p.userId.mobile}
-                            </p>
-                          </>
-                        ) : (
-                          <span className={colors.sub}>
-                            Guest User
-                          </span>
-                        )}
-                      </td>
+          {/* CONTENT */}
 
-                      <td className={colors.text}>
-                        {p.razorpayPaymentId ||
-                          p.razorpayOrderId}
-                      </td>
+          {loading ? (
+            <Skeleton />
+          ) : error ? (
+            <div className="p-10 text-center text-red-500">{error}</div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
 
-                      <td className={`font-semibold ${colors.text}`}>
-                        ₹ {p.amount}
-                      </td>
-
-                      <td className={colors.text}>{p.coins}</td>
-
-                      <td>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(
-                            p.status
-                          )}`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-
-                      <td className={colors.sub}>
-                        {new Date(
-                          p.createdAt
-                        ).toLocaleDateString()}
-                      </td>
+                  <thead className={`${theme.tableHead} ${theme.sub}`}>
+                    <tr>
+                      <th className="p-4 text-left font-semibold">User</th>
+                      <th className="text-left">Payment</th>
+                      <th>Amount</th>
+                      <th>Coins</th>
+                      <th>Status</th>
+                      <th>Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
 
-              {filtered.length === 0 && (
-                <div className="text-center p-10 text-slate-400">
-                  No payments found
-                </div>
-              )}
-            </div>
+                  <tbody>
+                    {paginated.map((p) => (
+                      <tr
+                        key={p._id}
+                        className={`border-t border-white/5 transition ${theme.hover}`}
+                      >
+                        <td className="p-4">
+                          {p.userId ? (
+                            <>
+                              <p className="font-semibold">
+                                {p.userId.name}
+                              </p>
+                              <p className={theme.sub}>
+                                {p.userId.mobile}
+                              </p>
+                            </>
+                          ) : (
+                            <span className={theme.sub}>
+                              Guest User
+                            </span>
+                          )}
+                        </td>
 
-            {/* PAGINATION */}
-            <div className="flex justify-between items-center p-4 border-t border-slate-200 dark:border-slate-800">
-              <p className={colors.sub}>
-                Page {page} of {totalPages || 1}
-              </p>
+                        <td className="font-mono text-xs">
+                          {p.razorpayPaymentId ||
+                            p.razorpayOrderId}
+                        </td>
 
-              <div className="flex gap-2">
-                <button
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => p - 1)}
-                  className="p-2 border rounded-lg disabled:opacity-40"
-                >
-                  <ChevronLeft size={16} />
-                </button>
+                        <td className="font-bold">
+                          ₹ {p.amount}
+                        </td>
 
-                <button
-                  disabled={page === totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                  className="p-2 border rounded-lg disabled:opacity-40"
-                >
-                  <ChevronRight size={16} />
-                </button>
+                        <td>{p.coins}</td>
+
+                        <td>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(
+                              p.status
+                            )}`}
+                          >
+                            {p.status}
+                          </span>
+                        </td>
+
+                        <td className={theme.sub}>
+                          {new Date(
+                            p.createdAt
+                          ).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {filtered.length === 0 && (
+                  <div className="text-center p-12 text-slate-400">
+                    No payments found
+                  </div>
+                )}
               </div>
-            </div>
-          </>
-        )}
+
+              {/* PAGINATION */}
+
+              <div className="flex justify-between items-center p-5 border-t border-white/10">
+                <p className={theme.sub}>
+                  Page {page} of {totalPages || 1}
+                </p>
+
+                <div className="flex gap-2">
+                  <PageBtn
+                    disabled={page === 1}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    <ChevronLeft size={16} />
+                  </PageBtn>
+
+                  <PageBtn
+                    disabled={page === totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    <ChevronRight size={16} />
+                  </PageBtn>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
+
+/* ================= PREMIUM STAT CARD ================= */
+
+const StatCard = ({ label, value, icon, isDark }) => (
+  <div
+    className={`
+      relative overflow-hidden rounded-3xl p-6
+      transition hover:-translate-y-1 hover:shadow-2xl
+      ${isDark
+        ? "bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/10"
+        : "bg-white border border-slate-200"}
+    `}
+  >
+    {/* glow */}
+    <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full"/>
+
+    <div className="flex justify-between items-center">
+      <div>
+        <p className={`${isDark ? "text-slate-400" : "text-slate-500"}`}>
+          {label}
+        </p>
+
+        <h2 className="text-2xl font-bold mt-1">
+          {value}
+        </h2>
+      </div>
+
+      <div className="p-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg">
+        {icon}
+      </div>
+    </div>
+  </div>
+);
+
+/* ================= PAGE BUTTON ================= */
+
+const PageBtn = ({ children, disabled, onClick }) => (
+  <button
+    disabled={disabled}
+    onClick={onClick}
+    className="
+      p-2 rounded-lg border border-white/10
+      hover:bg-white/10
+      disabled:opacity-40 disabled:cursor-not-allowed
+      transition
+    "
+  >
+    {children}
+  </button>
+);
+
+/* ================= SKELETON ================= */
+
+const Skeleton = () => (
+  <div className="p-6 space-y-4 animate-pulse">
+    {[...Array(6)].map((_, i) => (
+      <div key={i} className="h-14 rounded-xl bg-white/5"/>
+    ))}
+  </div>
+);
 
 export default AllPayments;
