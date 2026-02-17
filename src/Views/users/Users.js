@@ -417,14 +417,6 @@ const Users = ({ darkMode }) => {
           />
 
           <StatCard
-            title="Premium Users"
-            value={stats.premium}
-            icon={<Crown className="text-white" />}
-            gradient="from-amber-500 to-orange-500"
-            trend={stats.premium > 0 ? "+8%" : "0%"}
-          />
-
-          <StatCard
             title="Active Users"
             value={stats.active}
             icon={<CheckCircle className="text-white" />}
@@ -433,49 +425,7 @@ const Users = ({ darkMode }) => {
           />
         </div>
 
-        {/* WALLET & ACTIVITY SUMMARY */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className={`rounded-2xl p-5 ${theme.card}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`font-semibold ${theme.text}`}>
-                <Wallet className="inline mr-2" size={20} />
-                Wallet Summary
-              </h3>
-              <span className="text-sm font-bold text-emerald-500">
-                ₹ {stats.wallet.toLocaleString("en-IN")}
-              </span>
-            </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
-                style={{ width: '75%' }}
-              />
-            </div>
-          </div>
-
-          <div className={`rounded-2xl p-5 ${theme.card}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`font-semibold ${theme.text}`}>
-                <TrendingUp className="inline mr-2" size={20} />
-                User Status
-              </h3>
-              <div className="flex gap-3">
-                <span className="text-sm font-bold text-emerald-500">
-                  {stats.active} active
-                </span>
-                <span className="text-sm font-bold text-rose-500">
-                  {stats.blocked} blocked
-                </span>
-              </div>
-            </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-emerald-500 to-rose-500 rounded-full"
-                style={{ width: `${(stats.active / stats.total) * 100 || 0}%` }}
-              />
-            </div>
-          </div>
-        </div>
+        
 
         {/* TABLE */}
         <div className={`rounded-2xl overflow-hidden ${theme.card}`}>
@@ -638,15 +588,6 @@ const Users = ({ darkMode }) => {
                               tooltip="Edit User"
                             >
                               <Pencil size={16} />
-                            </ActionBtn>
-
-                            <ActionBtn 
-                              onClick={() => handleTogglePremium(user._id)} 
-                              color="amber" 
-                              dark={isDark}
-                              tooltip={user.isPremium ? "Remove Premium" : "Make Premium"}
-                            >
-                              <Crown size={16} />
                             </ActionBtn>
 
                             <ActionBtn 

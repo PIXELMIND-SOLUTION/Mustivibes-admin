@@ -262,15 +262,15 @@ const SingleUser = ({ darkMode }) => {
           </button>
 
           <div className="flex flex-wrap gap-2">
-            <button className={`px-4 py-3 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 hover:scale-105 flex items-center gap-2`}>
+            {/* <button className={`px-4 py-3 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 hover:scale-105 flex items-center gap-2`}>
               <Edit size={18} />
               <span className="hidden sm:inline">Edit Profile</span>
             </button>
             <button className={`px-4 py-3 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 hover:scale-105 flex items-center gap-2`}>
               <MessageCircle size={18} />
               <span className="hidden sm:inline">Send Message</span>
-            </button>
-            {user.isPermanentlyBlocked ? (
+            </button> */}
+            {/* {user.isPermanentlyBlocked ? (
               <button className="px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition-all duration-300 hover:scale-105">
                 Unblock User
               </button>
@@ -278,7 +278,7 @@ const SingleUser = ({ darkMode }) => {
               <button className="px-4 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white transition-all duration-300 hover:scale-105">
                 Block User
               </button>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -410,7 +410,7 @@ const SingleUser = ({ darkMode }) => {
 
         {/* TABS */}
         <div className="flex overflow-x-auto border-b border-pink-500/20">
-          {["overview", "activity", "matches", "settings"].map((tab) => (
+          {["overview", "activity", "settings"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -523,7 +523,7 @@ const SingleUser = ({ darkMode }) => {
             </div>
           )}
 
-          {activeTab === "matches" && (
+          {/* {activeTab === "matches" && (
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-pink-500">Matches & Connections</h3>
@@ -569,13 +569,13 @@ const SingleUser = ({ darkMode }) => {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
 
           {activeTab === "settings" && (
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-pink-500 mb-4">Account Management</h3>
               
-              <div className="grid md:grid-cols-2 gap-4">
+              {/* <div className="grid md:grid-cols-2 gap-4">
                 <button className={`p-4 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 text-left flex items-start gap-3`}>
                   <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20">
                     <Shield className="text-blue-500" />
@@ -615,7 +615,7 @@ const SingleUser = ({ darkMode }) => {
                     <p className="text-sm mt-1 opacity-70">Manage user coins</p>
                   </div>
                 </button>
-              </div>
+              </div> */}
 
               <div className="mt-8 pt-6 border-t border-pink-500/20 space-y-4">
                 <h4 className="font-semibold text-lg">Account Actions</h4>

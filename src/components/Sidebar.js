@@ -125,8 +125,8 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
       path: '/coins-packages',
       subItems: [
         { id: 'Coins Packages', text: 'Coin Packages', path: '/all-coin-packages' },
-        { id: 'Coins Prices', text: 'Pricing Plans', path: '/coins-prices' },
-        { id: 'Referal COnfig', text: 'Referal COnfiguration', path: '/referal' },
+        // { id: 'Coins Prices', text: 'Pricing Plans', path: '/coins-prices' },
+        { id: 'coin management', text: 'Coin Management', path: '/referal' },
       ]
     },
     { 

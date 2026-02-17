@@ -140,7 +140,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
       <div className="flex items-center space-x-2 md:space-x-3">
 
         {/* Search Bar - Desktop */}
-        <div className="hidden md:block relative group">
+        {/* <div className="hidden md:block relative group">
           <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
           <div className="relative">
             <input
@@ -161,7 +161,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-pink-500" />
           </div>
-        </div>
+        </div> */}
 
         {/* Dark Mode Toggle with gradient */}
         <button
