@@ -32,6 +32,12 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
 
   const adminData = JSON.parse(sessionStorage.getItem("AdminData"));
 
+  const NOTIFICATION_API = "http://31.97.206.144:4055/api/notifications";
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -61,15 +67,44 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const notifications = [
-    { id: 1, text: 'New user match made!', time: '2 min ago', unread: true, icon: <FiHeart className="text-pink-500" /> },
-    { id: 2, text: 'Premium subscription activated', time: '15 min ago', unread: true, icon: <FaFire className="text-orange-500" /> },
-    { id: 3, text: 'Report received from user', time: '1 hour ago', unread: true, icon: <MdEmojiPeople className="text-blue-500" /> },
-    { id: 4, text: 'New message in VIP chat', time: '3 hours ago', unread: false, icon: <FiMessageSquare className="text-green-500" /> },
-    { id: 5, text: 'Monthly analytics ready', time: '5 hours ago', unread: false, icon: <FaChartLine className="text-purple-500" /> },
-  ];
+  const fetchNotifications = async () => {
+    try {
+      setLoadingNotifications(true);
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+      const res = await fetch(NOTIFICATION_API);
+      const data = await res.json();
+
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unreadCount || 0);
+
+    } catch (err) {
+      console.error("Notification fetch error:", err);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const markNotificationRead = async (id) => {
+    try {
+      await fetch(`http://31.97.206.144:4055/api/notifications/${id}/read`, {
+        method: "PUT",
+      });
+
+      setNotifications(prev =>
+        prev.map(n => n._id === id ? { ...n, isRead: true } : n)
+      );
+
+      setUnreadCount(prev => Math.max(prev - 1, 0));
+
+    } catch (err) {
+      console.error("Mark read failed:", err);
+    }
+  };
+
 
   // Profile menu items
   const profileMenu = [
@@ -275,40 +310,49 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
 
                 {/* Notifications List */}
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.map(notification => (
-                    <div
-                      key={notification.id}
-                      className={`
-                        p-4 border-b border-pink-500/10
-                        transition-all duration-300
-                        cursor-pointer
-                        hover:bg-gradient-to-r hover:from-pink-500/5 hover:to-red-500/5
-                        ${notification.unread ? (darkMode ? 'bg-gray-800/50' : 'bg-pink-50/50') : ''}
-                        ${!notification.unread ? 'opacity-70' : ''}
-                      `}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className={`
-                          w-10 h-10 rounded-lg flex items-center justify-center
-                          ${notification.unread
-                            ? 'bg-gradient-to-r from-pink-500/20 to-red-500/20'
-                            : 'bg-gray-500/10'
-                          }
-                        `}>
-                          {notification.icon}
+                  {loadingNotifications ? (
+                    <div className="p-6 text-center text-sm opacity-70">Loading notifications...</div>
+                  ) : notifications.length === 0 ? (
+                    <div className="p-6 text-center text-sm opacity-70">No notifications</div>
+                  ) : (
+                    notifications.map(notification => (
+                      <div
+                        key={notification._id}
+                        onClick={() => !notification.isRead && markNotificationRead(notification._id)}
+                        className={`
+          p-4 border-b border-pink-500/10 cursor-pointer transition-all
+          hover:bg-gradient-to-r hover:from-pink-500/5 hover:to-red-500/5
+          ${notification.isRead ? "opacity-70" : (darkMode ? "bg-gray-800/40" : "bg-pink-50")}
+        `}
+                      >
+                        <div className="flex items-start space-x-3">
+
+                          {/* User Avatar */}
+                          <img
+                            src={
+                              notification.relatedUser?.profileImage ||
+                              "https://ui-avatars.com/api/?name=User&background=ec4899&color=fff"
+                            }
+                            className="w-10 h-10 rounded-full object-cover"
+                            alt=""
+                          />
+
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">{notification.title}</p>
+                            <p className="text-xs opacity-70 mt-1">{notification.body}</p>
+
+                            <p className="text-xs opacity-50 mt-1">
+                              {new Date(notification.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+
+                          {!notification.isRead && (
+                            <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mt-2" />
+                          )}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{notification.text}</p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                            {notification.time}
-                          </p>
-                        </div>
-                        {notification.unread && (
-                          <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mt-2" />
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 {/* Footer */}
