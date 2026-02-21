@@ -82,9 +82,7 @@ const Login = () => {
 
           <div className="mt-10 w-24 h-[3px] bg-pink-300 rounded-full"/>
 
-          <p className="mt-10 text-pink-200">
-            Premium Admin Console
-          </p>
+         
 
         </div>
       </div>
@@ -131,7 +129,7 @@ const Login = () => {
               font-semibold
             ">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/>
-              System Online
+              Admin Login
             </div>
           </div>
 
@@ -245,18 +243,6 @@ const Login = () => {
                 {loading ? "Signing in..." : "Login"}
               </span>
             </button>
-
-            {/* TRUST FOOTER */}
-            <div className="mt-6 flex items-center justify-between text-xs text-gray-400">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"/>
-                Protected
-              </div>
-
-              <div>256-bit Encryption</div>
-
-              <div>v3.2.0</div>
-            </div>
 
           </form>
 

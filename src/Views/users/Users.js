@@ -387,7 +387,7 @@ const Users = ({ darkMode }) => {
 
             <button
               onClick={fetchUsers}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
+              className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border ${darkMode ? 'bg-black text-white' : 'bg-white text-black'} shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95`}
               style={{
                 background: theme.button
               }}

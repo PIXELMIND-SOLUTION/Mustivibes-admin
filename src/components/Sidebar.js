@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CgDanger } from 'react-icons/cg';
 import {
   FaTachometerAlt,
   FaUsers,
@@ -141,12 +142,18 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
       text: 'Community Safety',
       path: '/forms-reports',
       subItems: [
-        { id: 'Complaints', text: 'User Complaints', path: '/complaints' },
+        // { id: 'Complaints', text: 'User Complaints', path: '/complaints' },
         { id: 'Reports', text: 'Profile Reports', path: '/reports' },
         { id: 'Warnings', text: 'User Warnings', path: '/warnings' },
-        { id: 'Feedback', text: 'App Feedback', path: '/feedback' },
-        { id: 'Contact', text: 'Contact Us', path: '/contactus' }
+        // { id: 'Feedback', text: 'App Feedback', path: '/feedback' },
+        // { id: 'Contact', text: 'Contact Us', path: '/contactus' }
       ]
+    },
+    { 
+      id: 'WarningFAQS', 
+      icon: <CgDanger />, 
+      text: 'WarningFAQS', 
+      path: '/warningfaqs' 
     },
     { 
       id: 'Notifications', 
@@ -430,34 +437,7 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
           </div>
 
           {/* Support & Logout */}
-          <div className="space-y-1">
-            <button
-              className={`
-                w-full flex items-center ${collapsed ? 'justify-center' : 'justify-start'} 
-                p-3 rounded-xl transition-all duration-300
-                ${darkMode ? 'hover:bg-pink-500/10 text-pink-400' : 'hover:bg-pink-500/5 text-pink-600'}
-                ${collapsed ? 'relative group' : ''}
-                backdrop-blur-sm
-                hover:border hover:border-pink-500/20
-              `}
-              onMouseEnter={() => collapsed && setHoveredItem('support')}
-              onMouseLeave={() => collapsed && setHoveredItem(null)}
-            >
-              <FaLifeRing className={`${collapsed ? 'text-xl' : 'text-lg'}`} />
-              {!collapsed && <span className="ml-3 font-medium">Support</span>}
-              
-              {collapsed && hoveredItem === 'support' && (
-                <div className={`
-                  absolute left-full ml-2 px-3 py-2 rounded-lg shadow-xl z-50
-                  bg-gradient-to-r from-pink-500 to-red-500
-                  text-white text-sm font-medium
-                  whitespace-nowrap
-                `}>
-                  Support
-                </div>
-              )}
-            </button>
-
+          <div className="space-y-1">      
             {/* Logout */}
             <div className="relative">
               <button

@@ -75,8 +75,8 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
   const profileMenu = [
     { icon: <FaBox className="text-pink-500" />, text: 'Dashboard', path: '/admin/' },
     { icon: <FiSettings className="text-blue-500" />, text: 'Account Settings', path: '/admin/settings' },
-    { icon: <FaDollarSign className="text-red-500" />, text: 'Payments', path: '/admin/payments' },
-    { icon: <FaUsers className="text-green-500" />, text: 'Manage Team', path: '/team' },
+    { icon: <FaDollarSign className="text-red-500" />, text: 'Payments', path: '/admin/all-payments' },
+    // { icon: <FaUsers className="text-green-500" />, text: 'Manage Team', path: '/team' },
   ];
 
   return (
@@ -314,7 +314,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
                 {/* Footer */}
                 <div className="p-3 text-center border-t border-pink-500/20">
                   <a
-                    href="#"
+                    href="/admin/notifications"
                     className={`
                       inline-flex items-center justify-center
                       px-4 py-2 rounded-lg

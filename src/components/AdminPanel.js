@@ -17,6 +17,8 @@ import ContactUs from '../Views/formsAndReports/ContactUs'
 import SingleUser from '../Views/users/SingleUser';
 import CreateRoom from '../Views/rooms/CreateRoom';
 import ReferralConfig from '../Views/coinPackages/ReferalConfig';
+import Notifications from '../Notifications';
+import WarningFAQS from '../WarningFAQS';
 
 const AdminPanel = () => {
     const navigate = useNavigate();
@@ -133,6 +135,10 @@ const AdminPanel = () => {
             <Route path='/warnings' element={<Warnings darkMode={darkMode} />} />
             <Route path='/feedback' element={<Feedback darkMode={darkMode} />} />
             <Route path='/contactus' element={<ContactUs darkMode={darkMode} />} />
+
+            <Route path='/warningfaqs' element={<WarningFAQS darkMode={darkMode} />} />
+
+            <Route path='/notifications' element={<Notifications darkMode={darkMode} />} />
 
             <Route path="/settings" element={<Settings darkMode={darkMode} />} />
 

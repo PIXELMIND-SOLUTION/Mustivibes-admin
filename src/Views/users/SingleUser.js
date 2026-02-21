@@ -410,7 +410,7 @@ const SingleUser = ({ darkMode }) => {
 
         {/* TABS */}
         <div className="flex overflow-x-auto border-b border-pink-500/20">
-          {["overview", "activity", "settings"].map((tab) => (
+          {["overview", "activity"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -458,7 +458,7 @@ const SingleUser = ({ darkMode }) => {
 
               {/* Premium Features */}
               <InfoCard title="Premium Features" icon={<Crown className="text-amber-500" />}>
-                <InfoRow icon={<Crown size={16} />} label="Premium Status" value={user.isPremium ? "Active" : "Inactive"} />
+                {/* <InfoRow icon={<Crown size={16} />} label="Premium Status" value={user.isPremium ? "Active" : "Inactive"} /> */}
                 <InfoRow icon={<Wallet size={16} />} label="Wallet Balance" value={`₹ ${user.wallet || 0}`} />
                 <InfoRow icon={<Award size={16} />} label="Total Coins" value={user.totalCoins || 0} />
                 <InfoRow icon={<Gift size={16} />} label="Gifts Sent" value={userStats.giftsSent} />
@@ -471,9 +471,7 @@ const SingleUser = ({ darkMode }) => {
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-pink-500">Recent Activity</h3>
-                <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-400 hover:from-pink-500/30 hover:to-purple-500/30 transition-all duration-300">
-                  View Full Log
-                </button>
+                
               </div>
               
               <div className={`rounded-xl p-4 ${isDark ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
@@ -571,51 +569,9 @@ const SingleUser = ({ darkMode }) => {
             </div>
           )} */}
 
-          {activeTab === "settings" && (
+          {/* {activeTab === "settings" && (
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-pink-500 mb-4">Account Management</h3>
-              
-              {/* <div className="grid md:grid-cols-2 gap-4">
-                <button className={`p-4 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 text-left flex items-start gap-3`}>
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20">
-                    <Shield className="text-blue-500" />
-                  </div>
-                  <div>
-                    <span className="font-medium">Manage Warnings</span>
-                    <p className="text-sm mt-1 opacity-70">View or add user warnings</p>
-                  </div>
-                </button>
-
-                <button className={`p-4 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 text-left flex items-start gap-3`}>
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20">
-                    <Crown className="text-amber-500" />
-                  </div>
-                  <div>
-                    <span className="font-medium">Premium Settings</span>
-                    <p className="text-sm mt-1 opacity-70">Manage premium status</p>
-                  </div>
-                </button>
-
-                <button className={`p-4 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 text-left flex items-start gap-3`}>
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-emerald-500/20 to-teal-500/20">
-                    <Wallet className="text-emerald-500" />
-                  </div>
-                  <div>
-                    <span className="font-medium">Wallet Management</span>
-                    <p className="text-sm mt-1 opacity-70">Add or deduct funds</p>
-                  </div>
-                </button>
-
-                <button className={`p-4 rounded-xl ${theme.card} ${theme.hover} transition-all duration-300 text-left flex items-start gap-3`}>
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-violet-500/20">
-                    <Award className="text-purple-500" />
-                  </div>
-                  <div>
-                    <span className="font-medium">Coin Management</span>
-                    <p className="text-sm mt-1 opacity-70">Manage user coins</p>
-                  </div>
-                </button>
-              </div> */}
 
               <div className="mt-8 pt-6 border-t border-pink-500/20 space-y-4">
                 <h4 className="font-semibold text-lg">Account Actions</h4>
@@ -650,7 +606,7 @@ const SingleUser = ({ darkMode }) => {
                 </p>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
