@@ -199,7 +199,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
         </div> */}
 
         {/* Dark Mode Toggle with gradient */}
-        <button
+        {/* <button
           onClick={toggleDarkMode}
           className={`
             p-2.5 rounded-xl 
@@ -218,7 +218,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
           ) : (
             <FaMoon className="text-xl text-purple-500" />
           )}
-        </button>
+        </button> */}
 
         {/* Fullscreen Button */}
         <button

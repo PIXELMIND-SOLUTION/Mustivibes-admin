@@ -1,220 +1,210 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import {
-  FaBell,
-  FaUserPlus,
-  FaUserMinus,
-  FaBan,
-  FaUnlock,
-  FaSearch,
-  FaCheck,
-  FaCheckDouble,
-  FaSync,
-  FaFilter,
-  FaInbox,
-  FaTimes,
-  FaTrash,
-  FaCommentAlt,
-  FaFlask,
+  FaBell, FaUserPlus, FaUserMinus, FaBan, FaUnlock,
+  FaSearch, FaCheck, FaCheckDouble, FaSync,
+  FaInbox, FaTimes, FaTrash, FaCommentAlt, FaFlask,
 } from "react-icons/fa";
 
 const BASE = "http://31.97.206.144:4055/api/notifications";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────
 const fmtDate = (d) => {
   const diff = (Date.now() - new Date(d)) / 1000;
   if (diff < 60) return "just now";
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return new Date(d).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 };
 
 const TYPE_META = {
-  follow:             { icon: FaUserPlus,   color: "emerald", label: "Follow" },
-  unfollow:           { icon: FaUserMinus,  color: "amber",   label: "Unfollow" },
-  block:              { icon: FaBan,        color: "red",     label: "Block" },
-  unblock:            { icon: FaUnlock,     color: "cyan",    label: "Unblock" },
-  feedback_submitted: { icon: FaCommentAlt, color: "pink",    label: "Feedback" },
-  test:               { icon: FaFlask,      color: "purple",  label: "Test" },
+  follow:             { icon: FaUserPlus,   color: "#10b981", label: "Follow" },
+  unfollow:           { icon: FaUserMinus,  color: "#f59e0b", label: "Unfollow" },
+  block:              { icon: FaBan,        color: "#ef4444", label: "Block" },
+  unblock:            { icon: FaUnlock,     color: "#06b6d4", label: "Unblock" },
+  feedback_submitted: { icon: FaCommentAlt, color: "#ec4899", label: "Feedback" },
+  test:               { icon: FaFlask,      color: "#a855f7", label: "Test" },
 };
+const DEFAULT_META = { icon: FaBell, color: "#6b7280", label: "Notification" };
 
-const DEFAULT_META = { icon: FaBell, color: "gray", label: "Notification" };
-
-const COLOR = {
-  emerald: { bg: "bg-emerald-500/10", text: "text-emerald-400", ring: "ring-emerald-500/30", grad: "from-emerald-500 to-teal-500" },
-  amber:   { bg: "bg-amber-500/10",   text: "text-amber-400",   ring: "ring-amber-500/30",   grad: "from-amber-500 to-orange-500" },
-  red:     { bg: "bg-red-500/10",     text: "text-red-400",     ring: "ring-red-500/30",     grad: "from-red-500 to-rose-600" },
-  cyan:    { bg: "bg-cyan-500/10",    text: "text-cyan-400",    ring: "ring-cyan-500/30",    grad: "from-cyan-500 to-blue-500" },
-  pink:    { bg: "bg-pink-500/10",    text: "text-pink-400",    ring: "ring-pink-500/30",    grad: "from-pink-500 to-rose-500" },
-  purple:  { bg: "bg-purple-500/10",  text: "text-purple-400",  ring: "ring-purple-500/30",  grad: "from-purple-500 to-indigo-500" },
-  gray:    { bg: "bg-gray-500/10",    text: "text-gray-400",    ring: "ring-gray-500/30",    grad: "from-gray-500 to-slate-500" },
-};
+// ─── Theme tokens — all inline, no Tailwind opacity utilities ─────────────
+const theme = (dm) => ({
+  bg:          dm ? "#0a0a0f"                       : "#f8fafc",
+  surface:     dm ? "#13131a"                       : "#ffffff",
+  surfaceHov:  dm ? "#1a1a24"                       : "#f9fafb",
+  surfaceUnrd: dm ? "#1a0f1a"                       : "#fdf2f8",
+  border:      dm ? "#2a2a3a"                       : "#e5e7eb",
+  borderUnrd:  dm ? "#4a1a4a"                       : "#fbcfe8",
+  text:        dm ? "#f3f4f6"                       : "#111827",
+  textSub:     dm ? "#9ca3af"                       : "#6b7280",
+  textMuted:   dm ? "#4b5563"                       : "#9ca3af",
+  inputBg:     dm ? "#0d0d14"                       : "#ffffff",
+  inputBorder: dm ? "#2a2a3a"                       : "#fbcfe8",
+  skeletonBg:  dm ? "#1f1f2e"                       : "#f3f4f6",
+  pink:        "#ec4899",
+  pinkDim:     dm ? "rgba(236,72,153,0.15)"         : "rgba(236,72,153,0.08)",
+  pinkBorder:  dm ? "rgba(236,72,153,0.35)"         : "rgba(236,72,153,0.3)",
+});
 
 // ─── Tab ──────────────────────────────────────────────────────────────────
-const Tab = ({ label, count, active, onClick, dm }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-      active
-        ? dm
-          ? "bg-pink-500/20 text-pink-400 ring-1 ring-pink-500/40"
-          : "bg-pink-100 text-pink-600 ring-1 ring-pink-300"
-        : dm
-        ? "text-white/30 hover:text-white/60"
-        : "text-gray-400 hover:text-gray-700"
-    }`}
-  >
-    {label}
-    {count > 0 && (
-      <span
-        className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-          active
-            ? "bg-pink-500 text-white"
-            : dm
-            ? "bg-white/10 text-white/50"
-            : "bg-gray-100 text-gray-500"
-        }`}
-      >
-        {count}
-      </span>
-    )}
-  </button>
-);
+const Tab = ({ label, count, active, onClick, dm }) => {
+  const t = theme(dm);
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", gap: 6,
+        padding: "5px 12px", borderRadius: 12,
+        fontSize: 12, fontWeight: 600,
+        border: `1px solid ${active ? t.pinkBorder : "transparent"}`,
+        background: active ? t.pinkDim : "transparent",
+        color: active ? t.pink : t.textSub,
+        cursor: "pointer", transition: "all 0.2s",
+      }}
+    >
+      {label}
+      {count > 0 && (
+        <span style={{
+          padding: "1px 6px", borderRadius: 999, fontSize: 10, fontWeight: 700,
+          background: active ? "#ec4899" : dm ? "rgba(255,255,255,0.08)" : "#f3f4f6",
+          color: active ? "#fff" : t.textSub,
+        }}>
+          {count}
+        </span>
+      )}
+    </button>
+  );
+};
 
 // ─── Notification Card ────────────────────────────────────────────────────
 const NotifCard = ({ notif, selected, onSelect, onMarkRead, onDelete, dm }) => {
+  const [hovered, setHovered] = useState(false);
   const meta = TYPE_META[notif.type] || DEFAULT_META;
   const Icon = meta.icon;
-  const col = COLOR[meta.color] || COLOR.gray;
   const unread = !notif.isRead;
   const user = notif.relatedUser;
+  const t = theme(dm);
 
   return (
     <div
-      className={`group relative flex items-start gap-3 p-4 rounded-2xl border transition-all ${
-        unread
-          ? dm
-            ? "bg-pink-500/5 border-pink-500/20"
-            : "bg-pink-50/60 border-pink-200"
-          : dm
-          ? "bg-white/3 border-white/8 hover:bg-white/5"
-          : "bg-white border-gray-100 hover:bg-gray-50"
-      }`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "relative",
+        display: "flex", alignItems: "flex-start", gap: 12,
+        padding: 16, borderRadius: 16,
+        border: `1px solid ${unread ? t.borderUnrd : t.border}`,
+        background: hovered ? t.surfaceHov : unread ? t.surfaceUnrd : t.surface,
+        transition: "all 0.2s",
+      }}
     >
       {/* Unread dot */}
       {unread && (
-        <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-pink-500 shadow-lg shadow-pink-500/50" />
+        <span style={{
+          position: "absolute", top: 14, right: 14,
+          width: 8, height: 8, borderRadius: "50%",
+          background: "#ec4899",
+          boxShadow: "0 0 6px rgba(236,72,153,0.7)",
+        }} />
       )}
 
       {/* Checkbox */}
       <button
         onClick={() => onSelect(notif._id)}
-        className={`flex-shrink-0 mt-0.5 w-4 h-4 rounded-md border-2 flex items-center justify-center transition-all ${
-          selected
-            ? "bg-gradient-to-br from-pink-500 to-rose-500 border-pink-500"
-            : dm
-            ? "border-white/20 hover:border-pink-400"
-            : "border-gray-300 hover:border-pink-400"
-        }`}
+        style={{
+          flexShrink: 0, marginTop: 2,
+          width: 16, height: 16, borderRadius: 5,
+          border: `2px solid ${selected ? "#ec4899" : dm ? "#374151" : "#d1d5db"}`,
+          background: selected ? "#ec4899" : "transparent",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer", transition: "all 0.2s", padding: 0,
+        }}
       >
-        {selected && <FaCheck className="text-white text-[8px]" />}
+        {selected && <FaCheck style={{ color: "#fff", fontSize: 7 }} />}
       </button>
 
       {/* Icon / Avatar */}
-      <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${col.bg} ring-1 ${col.ring} flex items-center justify-center overflow-hidden`}>
+      <div style={{
+        flexShrink: 0, width: 40, height: 40, borderRadius: 12,
+        background: `${meta.color}18`,
+        border: `1px solid ${meta.color}40`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        overflow: "hidden",
+      }}>
         {user?.profileImage ? (
           <img
             src={user.profileImage}
             alt={user.name}
-            className="w-full h-full object-cover"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => {
-              e.target.src = `https://ui-avatars.com/api/?name=${user.name}&background=e91e8c&color=fff&size=64`;
+              e.target.src = `https://ui-avatars.com/api/?name=${user?.name || "U"}&background=e91e8c&color=fff&size=64`;
             }}
           />
         ) : (
-          <Icon className={`text-sm ${col.text}`} />
+          <Icon style={{ color: meta.color, fontSize: 14 }} />
         )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-          <span className={`text-sm font-semibold ${dm ? "text-white" : "text-gray-900"}`}>
-            {notif.title}
-          </span>
-          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${col.bg} ${col.text}`}>
-            {meta.label}
-          </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 3 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{notif.title}</span>
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 999,
+            background: `${meta.color}18`, color: meta.color,
+          }}>{meta.label}</span>
           {notif.priority && notif.priority !== "low" && (
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-              notif.priority === "high"
-                ? "bg-red-500/10 text-red-400"
-                : "bg-amber-500/10 text-amber-400"
-            }`}>
-              {notif.priority}
-            </span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 999,
+              background: notif.priority === "high" ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)",
+              color: notif.priority === "high" ? "#ef4444" : "#f59e0b",
+            }}>{notif.priority}</span>
           )}
         </div>
-        <p className={`text-xs leading-relaxed ${dm ? "text-white/50" : "text-gray-500"} mb-1`}>
-          {notif.body}
-        </p>
-        {/* Feedback extra detail */}
+        <p style={{ fontSize: 12, color: t.textSub, lineHeight: 1.5, margin: "0 0 4px" }}>{notif.body}</p>
         {notif.relatedData?.experience && (
-          <p className={`text-xs italic ${dm ? "text-white/30" : "text-gray-400"} mb-1`}>
+          <p style={{ fontSize: 11, fontStyle: "italic", color: t.textMuted, margin: "0 0 3px" }}>
             "{notif.relatedData.experience}"
           </p>
         )}
         {notif.relatedData?.rating && (
-          <p className={`text-xs ${dm ? "text-amber-400" : "text-amber-500"} mb-1`}>
-            {"★".repeat(notif.relatedData.rating)}{"☆".repeat(5 - notif.relatedData.rating)} {notif.relatedData.rating}/5
+          <p style={{ fontSize: 11, color: "#f59e0b", margin: "0 0 3px" }}>
+            {"★".repeat(notif.relatedData.rating)}{"☆".repeat(5 - notif.relatedData.rating)}{" "}
+            {notif.relatedData.rating}/5
           </p>
         )}
-        <div className={`flex items-center gap-2 text-[10px] ${dm ? "text-white/30" : "text-gray-400"}`}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: t.textMuted }}>
           <span>{fmtDate(notif.createdAt)}</span>
           {user && (
             <>
-              <span>·</span>
-              <span>{user.name}</span>
-              {user.mobile && (
-                <>
-                  <span>·</span>
-                  <span>{user.mobile}</span>
-                </>
-              )}
+              <span>·</span><span>{user.name}</span>
+              {user.mobile && <><span>·</span><span>{user.mobile}</span></>}
             </>
           )}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+      <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 4, opacity: hovered ? 1 : 0, transition: "opacity 0.2s" }}>
         {unread && (
           <button
             onClick={() => onMarkRead(notif._id)}
             title="Mark as read"
-            className={`p-1.5 rounded-lg transition-all ${
-              dm
-                ? "text-white/30 hover:text-pink-400 hover:bg-pink-500/10"
-                : "text-gray-300 hover:text-pink-500 hover:bg-pink-50"
-            }`}
+            style={{ padding: 6, borderRadius: 8, border: "none", background: "transparent", cursor: "pointer", color: t.textMuted }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#ec4899"; e.currentTarget.style.background = "rgba(236,72,153,0.12)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = t.textMuted; e.currentTarget.style.background = "transparent"; }}
           >
-            <FaCheck className="text-xs" />
+            <FaCheck style={{ fontSize: 11 }} />
           </button>
         )}
         <button
           onClick={() => onDelete(notif._id)}
           title="Delete"
-          className={`p-1.5 rounded-lg transition-all ${
-            dm
-              ? "text-white/30 hover:text-red-400 hover:bg-red-500/10"
-              : "text-gray-300 hover:text-red-500 hover:bg-red-50"
-          }`}
+          style={{ padding: 6, borderRadius: 8, border: "none", background: "transparent", cursor: "pointer", color: t.textMuted }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.12)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = t.textMuted; e.currentTarget.style.background = "transparent"; }}
         >
-          <FaTrash className="text-xs" />
+          <FaTrash style={{ fontSize: 11 }} />
         </button>
       </div>
     </div>
@@ -222,170 +212,125 @@ const NotifCard = ({ notif, selected, onSelect, onMarkRead, onDelete, dm }) => {
 };
 
 // ─── Empty State ──────────────────────────────────────────────────────────
-const EmptyState = ({ dm }) => (
-  <div className={`flex flex-col items-center justify-center py-16 gap-3 ${dm ? "text-white/20" : "text-gray-300"}`}>
-    <FaInbox className="text-4xl" />
-    <p className="text-sm font-medium">No notifications found</p>
-  </div>
-);
+const EmptyState = ({ dm }) => {
+  const t = theme(dm);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: 12, color: t.textMuted }}>
+      <FaInbox style={{ fontSize: 40 }} />
+      <p style={{ fontSize: 13, fontWeight: 500, margin: 0 }}>No notifications found</p>
+    </div>
+  );
+};
 
 // ─── Toast ────────────────────────────────────────────────────────────────
-const Toast = ({ msg, dm }) => (
-  <div
-    className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-3 rounded-2xl shadow-2xl text-sm font-semibold transition-all animate-bounce-in ${
-      dm ? "bg-[#1a1a1a] border border-pink-500/30 text-white" : "bg-white border border-pink-200 text-gray-800"
-    }`}
-  >
-    <FaCheck className="text-pink-500" />
-    {msg}
-  </div>
-);
+const Toast = ({ msg, dm }) => {
+  const t = theme(dm);
+  return (
+    <div style={{
+      position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+      zIndex: 9999, display: "flex", alignItems: "center", gap: 8,
+      padding: "12px 20px", borderRadius: 16,
+      boxShadow: "0 8px 30px rgba(0,0,0,0.25)",
+      background: t.surface, border: `1px solid ${t.pinkBorder}`,
+      color: t.text, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap",
+    }}>
+      <FaCheck style={{ color: "#ec4899" }} />
+      {msg}
+    </div>
+  );
+};
 
 // ─── Main Component ───────────────────────────────────────────────────────
 const Notifications = ({ darkMode }) => {
-  const dm = darkMode;
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [marking, setMarking] = useState(false);
-  const [search, setSearch] = useState("");
-  const [activeType, setActiveType] = useState("all");
-  const [activeRead, setActiveRead] = useState("all");
-  const [selected, setSelected] = useState(new Set());
-  const [toast, setToast] = useState("");
+  const dm = !!darkMode;
+  const t = theme(dm);
 
-  // ── Fetch ──
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount]     = useState(0);
+  const [loading, setLoading]             = useState(false);
+  const [marking, setMarking]             = useState(false);
+  const [search, setSearch]               = useState("");
+  const [activeType, setActiveType]       = useState("all");
+  const [activeRead, setActiveRead]       = useState("all");
+  const [selected, setSelected]           = useState(new Set());
+  const [toast, setToast]                 = useState("");
+
   const fetchNotifs = async () => {
     try {
       setLoading(true);
       const res = await axios.get(BASE);
-      // API returns { success, notifications, pagination, unreadCount }
       setNotifications(res.data.notifications || []);
       setUnreadCount(res.data.unreadCount ?? 0);
-    } catch (e) {
-      console.error("Fetch error:", e);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { console.error("Fetch error:", e); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchNotifs();
-  }, []);
+  useEffect(() => { fetchNotifs(); }, []);
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 3000);
-  };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
-  // ── Mark single read: PUT /api/notifications/:id/read ──
   const markRead = async (id) => {
     try {
       setMarking(true);
       await axios.put(`${BASE}/${id}/read`);
-      setNotifications((prev) =>
-        prev.map((n) => (n._id === id ? { ...n, isRead: true, readAt: new Date().toISOString() } : n))
-      );
+      setNotifications((p) => p.map((n) => n._id === id ? { ...n, isRead: true } : n));
       setUnreadCount((c) => Math.max(0, c - 1));
       showToast("Marked as read");
-    } catch (e) {
-      console.error("Mark read error:", e);
-    } finally {
-      setMarking(false);
-    }
+    } catch (e) { console.error(e); } finally { setMarking(false); }
   };
 
-  // ── Mark selected unread ones as read ──
   const markSelectedRead = async () => {
-    const unreadIds = [...selected].filter((id) =>
-      notifications.find((n) => n._id === id && !n.isRead)
-    );
-    if (!unreadIds.length) return;
+    const ids = [...selected].filter((id) => notifications.find((n) => n._id === id && !n.isRead));
+    if (!ids.length) return;
     setMarking(true);
-    let successCount = 0;
-    await Promise.all(
-      unreadIds.map(async (id) => {
-        try {
-          await axios.put(`${BASE}/${id}/read`);
-          successCount++;
-        } catch (e) {
-          console.error(`Failed to mark ${id}:`, e);
-        }
-      })
-    );
-    setNotifications((prev) =>
-      prev.map((n) =>
-        unreadIds.includes(n._id) ? { ...n, isRead: true, readAt: new Date().toISOString() } : n
-      )
-    );
-    setUnreadCount((c) => Math.max(0, c - successCount));
+    let count = 0;
+    await Promise.all(ids.map(async (id) => { try { await axios.put(`${BASE}/${id}/read`); count++; } catch (e) { console.error(e); } }));
+    setNotifications((p) => p.map((n) => ids.includes(n._id) ? { ...n, isRead: true } : n));
+    setUnreadCount((c) => Math.max(0, c - count));
     setSelected(new Set());
-    showToast(`${successCount} notification${successCount > 1 ? "s" : ""} marked as read`);
+    showToast(`${count} notification${count > 1 ? "s" : ""} marked as read`);
     setMarking(false);
   };
 
-  // ── Mark ALL unread as read ──
   const markAllRead = async () => {
-    const unreadIds = notifications.filter((n) => !n.isRead).map((n) => n._id);
-    if (!unreadIds.length) return;
+    const ids = notifications.filter((n) => !n.isRead).map((n) => n._id);
+    if (!ids.length) return;
     setMarking(true);
-    let successCount = 0;
-    await Promise.all(
-      unreadIds.map(async (id) => {
-        try {
-          await axios.put(`${BASE}/${id}/read`);
-          successCount++;
-        } catch (e) {
-          console.error(`Failed to mark ${id}:`, e);
-        }
-      })
-    );
-    setNotifications((prev) =>
-      prev.map((n) =>
-        unreadIds.includes(n._id) ? { ...n, isRead: true, readAt: new Date().toISOString() } : n
-      )
-    );
+    let count = 0;
+    await Promise.all(ids.map(async (id) => { try { await axios.put(`${BASE}/${id}/read`); count++; } catch (e) { console.error(e); } }));
+    setNotifications((p) => p.map((n) => ({ ...n, isRead: true })));
     setUnreadCount(0);
-    showToast(`All ${successCount} notifications marked as read`);
+    showToast(`All ${count} notifications marked as read`);
     setMarking(false);
   };
 
-  // ── Delete: DELETE /api/notifications/:id ──
   const deleteNotif = async (id) => {
     try {
       await axios.delete(`${BASE}/${id}`);
       const wasUnread = notifications.find((n) => n._id === id && !n.isRead);
-      setNotifications((prev) => prev.filter((n) => n._id !== id));
+      setNotifications((p) => p.filter((n) => n._id !== id));
       if (wasUnread) setUnreadCount((c) => Math.max(0, c - 1));
-      setSelected((prev) => { const s = new Set(prev); s.delete(id); return s; });
+      setSelected((p) => { const s = new Set(p); s.delete(id); return s; });
       showToast("Notification deleted");
-    } catch (e) {
-      console.error("Delete error:", e);
-    }
+    } catch (e) { console.error(e); }
   };
 
-  // ── Delete selected ──
   const deleteSelected = async () => {
     const ids = [...selected];
     await Promise.all(ids.map((id) => axios.delete(`${BASE}/${id}`).catch(console.error)));
-    const unreadDeleted = ids.filter((id) => notifications.find((n) => n._id === id && !n.isRead)).length;
-    setNotifications((prev) => prev.filter((n) => !ids.includes(n._id)));
-    setUnreadCount((c) => Math.max(0, c - unreadDeleted));
+    const unreadDel = ids.filter((id) => notifications.find((n) => n._id === id && !n.isRead)).length;
+    setNotifications((p) => p.filter((n) => !ids.includes(n._id)));
+    setUnreadCount((c) => Math.max(0, c - unreadDel));
     setSelected(new Set());
     showToast(`${ids.length} notification${ids.length > 1 ? "s" : ""} deleted`);
   };
 
-  // ── Unique types for tabs ──
   const typeGroups = useMemo(() => {
     const map = {};
-    notifications.forEach((n) => {
-      if (!map[n.type]) map[n.type] = 0;
-      map[n.type]++;
-    });
+    notifications.forEach((n) => { map[n.type] = (map[n.type] || 0) + 1; });
     return Object.entries(map).map(([type, count]) => ({ type, count }));
   }, [notifications]);
 
-  // ── Filtered List ──
   const filtered = useMemo(() => {
     let data = [...notifications];
     if (activeType !== "all") data = data.filter((n) => n.type === activeType);
@@ -393,96 +338,93 @@ const Notifications = ({ darkMode }) => {
     if (activeRead === "read") data = data.filter((n) => n.isRead);
     if (search.trim()) {
       const s = search.toLowerCase();
-      data = data.filter(
-        (n) =>
-          n.title?.toLowerCase().includes(s) ||
-          n.body?.toLowerCase().includes(s) ||
-          n.relatedUser?.name?.toLowerCase().includes(s)
+      data = data.filter((n) =>
+        n.title?.toLowerCase().includes(s) ||
+        n.body?.toLowerCase().includes(s) ||
+        n.relatedUser?.name?.toLowerCase().includes(s)
       );
     }
     return data;
   }, [notifications, activeType, activeRead, search]);
 
-  // ── Select helpers ──
-  const toggleSelect = (id) =>
-    setSelected((prev) => {
-      const s = new Set(prev);
-      s.has(id) ? s.delete(id) : s.add(id);
-      return s;
-    });
+  const toggleSelect = (id) => setSelected((p) => { const s = new Set(p); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleAll   = () => setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((n) => n._id)));
+  const selectedUnread = [...selected].filter((id) => notifications.find((n) => n._id === id && !n.isRead));
 
-  const toggleAll = () =>
-    setSelected(
-      selected.size === filtered.length
-        ? new Set()
-        : new Set(filtered.map((n) => n._id))
-    );
-
-  const selectedUnread = [...selected].filter((id) =>
-    notifications.find((n) => n._id === id && !n.isRead)
-  );
-
-  // ── Input class ──
-  const inputCls = `px-4 py-2.5 rounded-xl border outline-none focus:ring-2 focus:ring-pink-500 transition text-sm ${
-    dm
-      ? "bg-[#0a0a0a] border-pink-500/20 text-white placeholder-white/20"
-      : "bg-white border-pink-200 text-gray-800 placeholder-gray-400"
-  }`;
+  const pillBtn = (active) => ({
+    padding: "4px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+    border: "none", cursor: "pointer", transition: "all 0.2s",
+    background: active ? t.pinkDim : "transparent",
+    color: active ? t.pink : t.textMuted,
+  });
 
   return (
-    <div className={`min-h-screen p-6 ${dm ? "bg-[#050505] text-white" : "bg-gray-50 text-gray-900"}`}>
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div style={{ minHeight: "100vh", padding: 24, background: t.bg, color: t.text, fontFamily: "system-ui,-apple-system,sans-serif" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
 
-        {/* ── Header ── */}
-        <div className="flex items-start justify-between gap-4">
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div>
-            <h1 className={`text-2xl font-black tracking-tight ${dm ? "text-white" : "text-gray-900"}`}>
+            <h1 style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px", color: t.text, margin: 0 }}>
               Notifications{" "}
-              <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+              <span style={{ background: "linear-gradient(135deg,#ec4899,#f43f5e)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 Center
               </span>
             </h1>
-            <p className={`text-xs mt-1 ${dm ? "text-white/30" : "text-gray-400"}`}>
+            <p style={{ fontSize: 12, color: t.textMuted, marginTop: 4, marginBottom: 0 }}>
               Monitor all platform activity and user interactions
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {unreadCount > 0 && (
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 text-xs font-bold ring-1 ring-pink-500/30">
-                <FaBell className="text-[10px]" />
-                {unreadCount} unread
+              <span style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "4px 12px", borderRadius: 999,
+                background: t.pinkDim, border: `1px solid ${t.pinkBorder}`,
+                color: t.pink, fontSize: 12, fontWeight: 700,
+              }}>
+                <FaBell style={{ fontSize: 10 }} /> {unreadCount} unread
               </span>
             )}
             <button
               onClick={fetchNotifs}
               disabled={loading}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 ${
-                dm
-                  ? "border-white/10 text-white/50 hover:bg-white/5"
-                  : "border-gray-200 text-gray-500 hover:bg-gray-100"
-              }`}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "8px 16px", borderRadius: 12,
+                border: `1px solid ${t.border}`,
+                background: "transparent", color: t.textSub,
+                fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.5 : 1, transition: "all 0.2s",
+              }}
             >
-              <FaSync className={`text-xs ${loading ? "animate-spin" : ""}`} />
+              <FaSync style={{ fontSize: 11, animation: loading ? "spin 1s linear infinite" : "none" }} />
               Refresh
             </button>
           </div>
         </div>
 
-        {/* ── Toolbar ── */}
-        <div className="space-y-3">
+        {/* Toolbar */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {/* Search */}
-          <div className="relative">
-            <FaSearch className={`absolute left-3 top-1/2 -translate-y-1/2 text-xs ${dm ? "text-white/20" : "text-gray-300"}`} />
+          <div style={{ position: "relative" }}>
+            <FaSearch style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: t.textMuted, fontSize: 12, pointerEvents: "none" }} />
             <input
               placeholder="Search notifications, users…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`${inputCls} pl-9 w-full`}
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "10px 36px", borderRadius: 12,
+                border: `1px solid ${t.inputBorder}`,
+                background: t.inputBg, color: t.text,
+                fontSize: 13, outline: "none",
+              }}
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${dm ? "text-white/20 hover:text-white/60" : "text-gray-300 hover:text-gray-600"}`}
+                style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: t.textMuted, fontSize: 12, padding: 0 }}
               >
                 <FaTimes />
               </button>
@@ -490,57 +432,24 @@ const Notifications = ({ darkMode }) => {
           </div>
 
           {/* Type tabs */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Tab
-              label="All"
-              count={notifications.length}
-              active={activeType === "all"}
-              onClick={() => setActiveType("all")}
-              dm={dm}
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <Tab label="All" count={notifications.length} active={activeType === "all"} onClick={() => setActiveType("all")} dm={dm} />
             {typeGroups.map((f) => {
               const meta = TYPE_META[f.type] || DEFAULT_META;
-              return (
-                <Tab
-                  key={f.type}
-                  label={meta.label}
-                  count={f.count}
-                  active={activeType === f.type}
-                  onClick={() => setActiveType(f.type)}
-                  dm={dm}
-                />
-              );
+              return <Tab key={f.type} label={meta.label} count={f.count} active={activeType === f.type} onClick={() => setActiveType(f.type)} dm={dm} />;
             })}
           </div>
 
-          {/* Read filter + bulk actions */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Read filter + actions */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
             {["all", "unread", "read"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setActiveRead(r)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  activeRead === r
-                    ? dm
-                      ? "bg-pink-500/20 text-pink-400 ring-1 ring-pink-500/40"
-                      : "bg-pink-100 text-pink-600"
-                    : dm
-                    ? "text-white/30 hover:text-white/60"
-                    : "text-gray-400 hover:text-gray-700"
-                }`}
-              >
+              <button key={r} onClick={() => setActiveRead(r)} style={pillBtn(activeRead === r)}>
                 {r.charAt(0).toUpperCase() + r.slice(1)}
               </button>
             ))}
-
-            <div className="ml-auto flex items-center gap-2">
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
               {filtered.length > 0 && (
-                <button
-                  onClick={toggleAll}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    dm ? "text-white/30 hover:text-white/60" : "text-gray-400 hover:text-gray-700"
-                  }`}
-                >
+                <button onClick={toggleAll} style={pillBtn(false)}>
                   {selected.size === filtered.length ? "Deselect All" : "Select All"}
                 </button>
               )}
@@ -548,82 +457,87 @@ const Notifications = ({ darkMode }) => {
                 <button
                   onClick={markSelectedRead}
                   disabled={marking}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/25 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "6px 14px", borderRadius: 12, border: "none", cursor: "pointer",
+                    background: "linear-gradient(135deg,#ec4899,#f43f5e)",
+                    color: "#fff", fontSize: 12, fontWeight: 700,
+                    opacity: marking ? 0.5 : 1,
+                    boxShadow: "0 4px 14px rgba(236,72,153,0.35)",
+                  }}
                 >
-                  <FaCheck className="text-[10px]" />
-                  Mark {selectedUnread.length} Read
+                  <FaCheck style={{ fontSize: 10 }} /> Mark {selectedUnread.length} Read
                 </button>
               )}
               {selected.size > 0 && (
                 <button
                   onClick={deleteSelected}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-md shadow-red-500/25 hover:opacity-90 active:scale-95 transition-all"
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "6px 14px", borderRadius: 12, border: "none", cursor: "pointer",
+                    background: "linear-gradient(135deg,#ef4444,#f43f5e)",
+                    color: "#fff", fontSize: 12, fontWeight: 700,
+                    boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
+                  }}
                 >
-                  <FaTrash className="text-[10px]" />
-                  Delete {selected.size}
+                  <FaTrash style={{ fontSize: 10 }} /> Delete {selected.size}
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* ── Results meta ── */}
-        <p className={`text-xs ${dm ? "text-white/20" : "text-gray-400"}`}>
+        {/* Meta */}
+        <p style={{ fontSize: 11, color: t.textMuted, margin: 0 }}>
           Showing {filtered.length} of {notifications.length} notifications
-          {selected.size > 0 && (
-            <span className="text-pink-400 font-semibold"> · {selected.size} selected</span>
-          )}
+          {selected.size > 0 && <span style={{ color: "#ec4899", fontWeight: 600 }}> · {selected.size} selected</span>}
         </p>
 
-        {/* ── List ── */}
+        {/* List */}
         {loading ? (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className={`h-20 rounded-2xl animate-pulse ${dm ? "bg-white/5" : "bg-gray-100"}`}
-              />
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} style={{ height: 80, borderRadius: 16, background: t.skeletonBg, animation: "pulse 1.5s ease-in-out infinite" }} />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState dm={dm} />
         ) : (
-          <div className="space-y-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {filtered.map((n) => (
-              <NotifCard
-                key={n._id}
-                notif={n}
-                selected={selected.has(n._id)}
-                onSelect={toggleSelect}
-                onMarkRead={markRead}
-                onDelete={deleteNotif}
-                dm={dm}
-              />
+              <NotifCard key={n._id} notif={n} selected={selected.has(n._id)} onSelect={toggleSelect} onMarkRead={markRead} onDelete={deleteNotif} dm={dm} />
             ))}
           </div>
         )}
 
-        {/* ── Mark All Unread ── */}
+        {/* Mark All */}
         {unreadCount > 0 && !loading && (
-          <div className="flex justify-center pt-2">
+          <div style={{ display: "flex", justifyContent: "center", paddingTop: 8 }}>
             <button
               onClick={markAllRead}
               disabled={marking}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border text-sm font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 ${
-                dm
-                  ? "border-pink-500/20 text-pink-400 hover:bg-pink-500/10"
-                  : "border-pink-300 text-pink-600 hover:bg-pink-50"
-              }`}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "10px 24px", borderRadius: 12,
+                border: `1px solid ${t.pinkBorder}`,
+                background: "transparent", color: t.pink,
+                fontSize: 13, fontWeight: 600,
+                cursor: marking ? "not-allowed" : "pointer",
+                opacity: marking ? 0.5 : 1, transition: "all 0.2s",
+              }}
             >
-              <FaCheckDouble />
-              Mark All {unreadCount} as Read
+              <FaCheckDouble /> Mark All {unreadCount} as Read
             </button>
           </div>
         )}
       </div>
 
-      {/* ── Toast ── */}
       {toast && <Toast msg={toast} dm={dm} />}
+
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes spin  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+      `}</style>
     </div>
   );
 };
