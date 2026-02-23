@@ -130,22 +130,23 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
       {/* Left Section */}
       <div className="flex items-center space-x-4">
         {/* Menu Toggle Button with gradient */}
-        <button
-          onClick={toggleSidebar}
-          className={`
-            p-2.5 rounded-xl 
-            bg-gradient-to-r from-pink-500/10 to-red-500/10
-            hover:from-pink-500/20 hover:to-red-500/20
-            border border-pink-500/20
-            transition-all duration-300
-            hover:scale-105
-            shadow-sm
-            ${isMobile ? "" : "d-none"}
-          `}
-          aria-label="Toggle menu"
-        >
-          <FiMenu className="text-xl text-pink-500" />
-        </button>
+        {isMobile && (
+          <button
+            onClick={toggleSidebar}
+            className="
+      p-2.5 rounded-xl 
+      bg-gradient-to-r from-pink-500/10 to-red-500/10
+      hover:from-pink-500/20 hover:to-red-500/20
+      border border-pink-500/20
+      transition-all duration-300
+      hover:scale-105
+      shadow-sm
+    "
+            aria-label="Toggle menu"
+          >
+            <FiMenu className="text-xl text-pink-500" />
+          </button>
+        )}
 
         {/* Logo/Brand for mobile */}
         <div className="md:hidden flex items-center">

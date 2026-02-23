@@ -13,7 +13,7 @@ const Toast = ({ msg, type }) => (
   <>
     <style>{`@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
     <div
-      className={`fixed bottom-6 right-6 z-[999] flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-semibold text-white
+      className={`fixed top-6 right-6 z-[999] flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-semibold text-white
         ${type === "success" ? "bg-gradient-to-r from-emerald-500 to-teal-500" : "bg-gradient-to-r from-red-500 to-pink-600"}`}
       style={{ animation: "slideUp .25s ease" }}
     >

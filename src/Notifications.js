@@ -227,7 +227,7 @@ const Toast = ({ msg, dm }) => {
   const t = theme(dm);
   return (
     <div style={{
-      position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+      position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)",
       zIndex: 9999, display: "flex", alignItems: "center", gap: 8,
       padding: "12px 20px", borderRadius: 16,
       boxShadow: "0 8px 30px rgba(0,0,0,0.25)",

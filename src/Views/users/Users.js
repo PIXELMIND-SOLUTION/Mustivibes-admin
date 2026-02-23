@@ -59,7 +59,7 @@ const Users = ({ darkMode }) => {
     isPermanentlyBlocked: false,
     hasCompletedProfile: false
   });
-  
+
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 8;
@@ -94,10 +94,10 @@ const Users = ({ darkMode }) => {
   /* ================= UPDATE USER ================= */
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
-    
+
     try {
       setUpdating(selectedUser._id);
-      
+
       const formData = new FormData();
       Object.keys(editForm).forEach(key => {
         formData.append(key, editForm[key]);
@@ -111,12 +111,12 @@ const Users = ({ darkMode }) => {
 
       if (response.data.success) {
         // Update local state
-        setUsers(users.map(user => 
-          user._id === selectedUser._id 
+        setUsers(users.map(user =>
+          user._id === selectedUser._id
             ? { ...user, ...editForm, isPremium: editForm.userType === 'premium' }
             : user
         ));
-        
+
         showToast("User updated successfully!", "success");
         setShowEditModal(false);
         setSelectedUser(null);
@@ -134,20 +134,20 @@ const Users = ({ darkMode }) => {
   /* ================= DELETE USER ================= */
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
-    
+
     try {
       setDeleting(selectedUser._id);
-      
+
       const response = await axios.delete(DELETE_USER_API(selectedUser._id));
-      
+
       if (response.data.success) {
         // Remove from local state
         setUsers(users.filter(user => user._id !== selectedUser._id));
-        
+
         showToast("User deleted successfully!", "success");
         setShowDeleteModal(false);
         setSelectedUser(null);
-        
+
         // Reset to first page if needed
         if (paginatedUsers.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1);
@@ -194,14 +194,14 @@ const Users = ({ darkMode }) => {
   const filteredUsers = useMemo(() => {
     const term = search.toLowerCase();
     return users.filter((u) => {
-      const matchesSearch = u.name?.toLowerCase().includes(term) || 
-                           u.mobile?.includes(term) || 
-                           u.nickname?.toLowerCase().includes(term);
+      const matchesSearch = u.name?.toLowerCase().includes(term) ||
+        u.mobile?.includes(term) ||
+        u.nickname?.toLowerCase().includes(term);
       const matchesGender = selectedGender === "all" || u.gender === selectedGender;
-      const matchesStatus = selectedStatus === "all" || 
+      const matchesStatus = selectedStatus === "all" ||
         (selectedStatus === "online" && u.isOnline) ||
         (selectedStatus === "offline" && !u.isOnline);
-      
+
       return matchesSearch && matchesGender && matchesStatus;
     });
   }, [users, search, selectedGender, selectedStatus]);
@@ -276,13 +276,13 @@ const Users = ({ darkMode }) => {
   const handleTogglePremium = async (userId) => {
     const user = users.find(u => u._id === userId);
     if (!user) return;
-    
+
     try {
       const newUserType = user.isPremium ? "regular" : "premium";
-      
+
       const formData = new FormData();
       formData.append('userType', newUserType);
-      
+
       const response = await axios.put(UPDATE_USER_API(userId), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -290,8 +290,8 @@ const Users = ({ darkMode }) => {
       });
 
       if (response.data.success) {
-        setUsers(users.map(u => 
-          u._id === userId 
+        setUsers(users.map(u =>
+          u._id === userId
             ? { ...u, isPremium: !u.isPremium, userType: newUserType }
             : u
         ));
@@ -307,13 +307,12 @@ const Users = ({ darkMode }) => {
     <div className={`min-h-screen ${theme.page} p-4 md:p-8 relative`}>
       {/* Toast Notification */}
       {toast.show && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 animate-slideIn ${
-          toast.type === 'success' 
-            ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white' 
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 animate-slideIn ${toast.type === 'success'
+            ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white'
             : toast.type === 'error'
-            ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white'
-            : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
-        }`}>
+              ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white'
+              : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
+          }`}>
           <div className="flex items-center gap-3">
             {toast.type === 'success' ? (
               <CheckCircle size={20} />
@@ -425,7 +424,7 @@ const Users = ({ darkMode }) => {
           />
         </div>
 
-        
+
 
         {/* TABLE */}
         <div className={`rounded-2xl overflow-hidden ${theme.card}`}>
@@ -467,11 +466,10 @@ const Users = ({ darkMode }) => {
                                 </div>
                               )}
                               {(user.isTemporarilyBlocked || user.isPermanentlyBlocked) && (
-                                <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${
-                                  user.isPermanentlyBlocked 
-                                    ? 'bg-gradient-to-r from-rose-600 to-red-700' 
+                                <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${user.isPermanentlyBlocked
+                                    ? 'bg-gradient-to-r from-rose-600 to-red-700'
                                     : 'bg-gradient-to-r from-amber-500 to-orange-600'
-                                }`}>
+                                  }`}>
                                   <Shield size={10} className="text-white" />
                                 </div>
                               )}
@@ -485,11 +483,10 @@ const Users = ({ darkMode }) => {
                                   </span>
                                 )}
                                 {(user.isTemporarilyBlocked || user.isPermanentlyBlocked) && (
-                                  <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                                    user.isPermanentlyBlocked 
-                                      ? 'bg-gradient-to-r from-rose-600 to-red-700 text-white' 
+                                  <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${user.isPermanentlyBlocked
+                                      ? 'bg-gradient-to-r from-rose-600 to-red-700 text-white'
                                       : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                                  }`}>
+                                    }`}>
                                     {user.isPermanentlyBlocked ? 'PERM BANNED' : 'TEMP BANNED'}
                                   </span>
                                 )}
@@ -572,27 +569,27 @@ const Users = ({ darkMode }) => {
                         {/* ACTIONS */}
                         <td className="p-4">
                           <div className="flex justify-center gap-2">
-                            <ActionBtn 
-                              onClick={() => handleViewProfile(user._id)} 
-                              color="blue" 
+                            <ActionBtn
+                              onClick={() => handleViewProfile(user._id)}
+                              color="blue"
                               dark={isDark}
                               tooltip="View Profile"
                             >
                               <FaEye size={16} />
                             </ActionBtn>
 
-                            <ActionBtn 
-                              onClick={() => openEditModal(user)} 
-                              color="green" 
+                            <ActionBtn
+                              onClick={() => openEditModal(user)}
+                              color="green"
                               dark={isDark}
                               tooltip="Edit User"
                             >
                               <Pencil size={16} />
                             </ActionBtn>
 
-                            <ActionBtn 
-                              onClick={() => openDeleteModal(user)} 
-                              color="rose" 
+                            <ActionBtn
+                              onClick={() => openDeleteModal(user)}
+                              color="rose"
                               dark={isDark}
                               tooltip="Delete User"
                             >
@@ -690,7 +687,7 @@ const Users = ({ darkMode }) => {
                   <input
                     type="text"
                     value={editForm.name}
-                    onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                     placeholder="Enter full name"
                   />
@@ -703,7 +700,7 @@ const Users = ({ darkMode }) => {
                   <input
                     type="text"
                     value={editForm.nickname}
-                    onChange={(e) => setEditForm({...editForm, nickname: e.target.value})}
+                    onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                     placeholder="Enter nickname"
                   />
@@ -716,7 +713,7 @@ const Users = ({ darkMode }) => {
                     </label>
                     <select
                       value={editForm.gender}
-                      onChange={(e) => setEditForm({...editForm, gender: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
                       className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                     >
                       <option value="male">Male</option>
@@ -733,7 +730,7 @@ const Users = ({ darkMode }) => {
                     <input
                       type="date"
                       value={editForm.dob}
-                      onChange={(e) => setEditForm({...editForm, dob: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
                       className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                     />
                   </div>
@@ -746,7 +743,7 @@ const Users = ({ darkMode }) => {
                   </label>
                   <select
                     value={editForm.language}
-                    onChange={(e) => setEditForm({...editForm, language: e.target.value})}
+                    onChange={(e) => setEditForm({ ...editForm, language: e.target.value })}
                     className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                   >
                     <option value="hindi">Hindi</option>
@@ -764,9 +761,16 @@ const Users = ({ darkMode }) => {
                   <input
                     type="tel"
                     value={editForm.mobile}
-                    onChange={(e) => setEditForm({...editForm, mobile: e.target.value})}
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setEditForm({ ...editForm, mobile: digits });
+                    }}
                     className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
-                    placeholder="Enter mobile number"
+                    placeholder="Enter 10 digit mobile number"
+                    required
                   />
                 </div>
 
@@ -777,7 +781,7 @@ const Users = ({ darkMode }) => {
                     </label>
                     <select
                       value={editForm.userType}
-                      onChange={(e) => setEditForm({...editForm, userType: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, userType: e.target.value })}
                       className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                     >
                       <option value="regular">Regular</option>
@@ -792,7 +796,7 @@ const Users = ({ darkMode }) => {
                     <input
                       type="number"
                       value={editForm.wallet}
-                      onChange={(e) => setEditForm({...editForm, wallet: parseFloat(e.target.value) || 0})}
+                      onChange={(e) => setEditForm({ ...editForm, wallet: parseFloat(e.target.value) || 0 })}
                       className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                       placeholder="Enter wallet amount"
                     />
@@ -808,7 +812,7 @@ const Users = ({ darkMode }) => {
                       type="number"
                       min="0"
                       value={editForm.warningsCount}
-                      onChange={(e) => setEditForm({...editForm, warningsCount: parseInt(e.target.value) || 0})}
+                      onChange={(e) => setEditForm({ ...editForm, warningsCount: parseInt(e.target.value) || 0 })}
                       className={`w-full px-4 py-2.5 rounded-xl border ${theme.input} focus:outline-none focus:ring-2 focus:ring-pink-500/30`}
                       placeholder="Number of warnings"
                     />
@@ -819,7 +823,7 @@ const Users = ({ darkMode }) => {
                       <input
                         type="checkbox"
                         checked={editForm.isActive}
-                        onChange={(e) => setEditForm({...editForm, isActive: e.target.checked})}
+                        onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
                         className="w-4 h-4 text-pink-500 rounded focus:ring-pink-500/30"
                       />
                       <span className={theme.sub}>Active User</span>
@@ -832,7 +836,7 @@ const Users = ({ darkMode }) => {
                     <input
                       type="checkbox"
                       checked={editForm.isTemporarilyBlocked}
-                      onChange={(e) => setEditForm({...editForm, isTemporarilyBlocked: e.target.checked})}
+                      onChange={(e) => setEditForm({ ...editForm, isTemporarilyBlocked: e.target.checked })}
                       className="w-4 h-4 text-amber-500 rounded focus:ring-amber-500/30"
                     />
                     <span className={theme.sub}>Temporarily Blocked</span>
@@ -842,7 +846,7 @@ const Users = ({ darkMode }) => {
                     <input
                       type="checkbox"
                       checked={editForm.isPermanentlyBlocked}
-                      onChange={(e) => setEditForm({...editForm, isPermanentlyBlocked: e.target.checked})}
+                      onChange={(e) => setEditForm({ ...editForm, isPermanentlyBlocked: e.target.checked })}
                       className="w-4 h-4 text-rose-500 rounded focus:ring-rose-500/30"
                     />
                     <span className={theme.sub}>Permanently Blocked</span>
@@ -853,7 +857,7 @@ const Users = ({ darkMode }) => {
                   <input
                     type="checkbox"
                     checked={editForm.hasCompletedProfile}
-                    onChange={(e) => setEditForm({...editForm, hasCompletedProfile: e.target.checked})}
+                    onChange={(e) => setEditForm({ ...editForm, hasCompletedProfile: e.target.checked })}
                     className="w-4 h-4 text-emerald-500 rounded focus:ring-emerald-500/30"
                   />
                   <span className={theme.sub}>Profile Completed</span>
@@ -862,22 +866,20 @@ const Users = ({ darkMode }) => {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className={`flex-1 px-4 py-3 rounded-xl border ${
-                      isDark 
-                        ? 'border-pink-500/30 text-pink-300 hover:bg-pink-500/10' 
+                    className={`flex-1 px-4 py-3 rounded-xl border ${isDark
+                        ? 'border-pink-500/30 text-pink-300 hover:bg-pink-500/10'
                         : 'border-pink-300 text-pink-600 hover:bg-pink-50'
-                    } transition-all duration-300`}
+                      } transition-all duration-300`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleUpdateUser}
                     disabled={updating === selectedUser._id}
-                    className={`flex-1 px-4 py-3 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-xl ${
-                      updating === selectedUser._id 
-                        ? 'opacity-70 cursor-not-allowed' 
+                    className={`flex-1 px-4 py-3 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-xl ${updating === selectedUser._id
+                        ? 'opacity-70 cursor-not-allowed'
                         : 'hover:scale-105'
-                    }`}
+                      }`}
                     style={{
                       background: theme.button
                     }}
@@ -908,19 +910,18 @@ const Users = ({ darkMode }) => {
                   <Trash2 size={28} className="text-rose-500" />
                 </div>
               </div>
-              
+
               <h2 className={`text-xl font-bold text-center mb-2 ${theme.text}`}>
                 Delete User
               </h2>
               <p className={`text-center mb-6 ${theme.sub}`}>
-                Are you sure you want to delete <span className="font-semibold text-rose-500">{selectedUser.name}</span>? 
+                Are you sure you want to delete <span className="font-semibold text-rose-500">{selectedUser.name}</span>?
                 This action cannot be undone.
               </p>
 
               <div className="space-y-4">
-                <div className={`p-4 rounded-xl ${
-                  isDark ? 'bg-gray-800/50' : 'bg-rose-50/50'
-                }`}>
+                <div className={`p-4 rounded-xl ${isDark ? 'bg-gray-800/50' : 'bg-rose-50/50'
+                  }`}>
                   <p className={`text-sm ${theme.sub} mb-2`}>User details:</p>
                   <div className="flex items-center gap-3">
                     <img
@@ -938,22 +939,20 @@ const Users = ({ darkMode }) => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className={`flex-1 px-4 py-3 rounded-xl border ${
-                      isDark 
-                        ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                    className={`flex-1 px-4 py-3 rounded-xl border ${isDark
+                        ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
                         : 'border-gray-300 text-gray-600 hover:bg-gray-100'
-                    } transition-all duration-300`}
+                      } transition-all duration-300`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDeleteUser}
                     disabled={deleting === selectedUser._id}
-                    className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                      deleting === selectedUser._id
+                    className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${deleting === selectedUser._id
                         ? 'bg-gradient-to-r from-rose-400 to-red-400 opacity-70 cursor-not-allowed'
                         : 'bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 hover:shadow-xl hover:scale-105'
-                    } text-white`}
+                      } text-white`}
                   >
                     {deleting === selectedUser._id ? (
                       <span className="flex items-center justify-center gap-2">
@@ -1038,7 +1037,7 @@ const PageBtn = ({ children, disabled, onClick, active, dark }) => (
     onClick={onClick}
     className={`
       w-10 h-10 rounded-lg border transition-all duration-300
-      ${active 
+      ${active
         ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-500 shadow-lg scale-105"
         : dark
           ? "border-pink-500/30 text-pink-300 hover:bg-pink-500/20 hover:scale-105"

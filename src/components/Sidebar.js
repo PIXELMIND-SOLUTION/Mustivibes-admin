@@ -52,41 +52,18 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   // Animated floating hearts
   const [hearts, setHearts] = useState([]);
 
-  useEffect(() => {
-    // Update active item based on route
-    const path = location.pathname;
-    if (path.includes('/users')) setActiveItem('users');
-    else if (path.includes('/allrooms')) {
-      setActiveItem('AllRooms');
-      setOpenSubmenus(prev => ({ ...prev, AllRooms: true }));
-    }
-    else if (path.includes('/coins')) {
-      setActiveItem('CoinsPackages');
-      setOpenSubmenus(prev => ({ ...prev, CoinsPackages: true }));
-    }
-    else if (path.includes('/payments')) setActiveItem('Payments');
-    else if (path.includes('/complaints') || path.includes('/reports') || path.includes('/warnings') || path.includes('/feedback') || path.includes('/contactus')) {
-      setActiveItem('FormsReports');
-      setOpenSubmenus(prev => ({ ...prev, FormsReports: true }));
-    }
-    else if (path.includes('/settings')) {
-      setActiveItem('Settings');
-      setOpenSubmenus(prev => ({ ...prev, settings: true }));
-    }
-    else setActiveItem('dashboard');
+  // ── Active detection: pure exact-match, no state, no includes() ─────────────
+  const currentPath = location.pathname;
 
-    // Create floating hearts
-    const heartsArray = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 8 + 6,
-      speed: Math.random() * 3 + 1,
-      opacity: Math.random() * 0.2 + 0.1,
-      delay: Math.random() * 2
-    }));
-    setHearts(heartsArray);
-  }, [location]);
+  const pathMatches = (path) => {
+    if (path === '/') return currentPath === '/'; // dashboard: exact root only
+    return currentPath === path;                   // all others: exact match
+  };
+
+  const isItemActive = (item) => {
+    if (item.subItems) return item.subItems.some((sub) => pathMatches(sub.path));
+    return pathMatches(item.path);
+  };
 
   const toggleSubmenu = (menu) => {
     if (collapsed) return;
@@ -97,17 +74,17 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
   };
 
   const menuItems = [
-    { 
-      id: 'dashboard', 
-      icon: <FaTachometerAlt />, 
-      text: 'Dashboard', 
-      path: '/' 
+    {
+      id: 'dashboard',
+      icon: <FaTachometerAlt />,
+      text: 'Dashboard',
+      path: '/'
     },
-    { 
-      id: 'users', 
-      icon: <FiUsersIcon className="text-xl" />, 
-      text: 'Users Management', 
-      path: '/users' 
+    {
+      id: 'users',
+      icon: <FiUsersIcon className="text-xl" />,
+      text: 'Users Management',
+      path: '/users'
     },
     {
       id: 'AllRooms',
@@ -130,11 +107,11 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
         { id: 'coin management', text: 'Coin Management', path: '/referal' },
       ]
     },
-    { 
-      id: 'Payments', 
-      icon: <FaFileInvoiceDollar />, 
-      text: 'Payments', 
-      path: '/all-payments' 
+    {
+      id: 'Payments',
+      icon: <FaFileInvoiceDollar />,
+      text: 'Payments',
+      path: '/all-payments'
     },
     {
       id: 'FormsReports',
@@ -149,23 +126,23 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
         // { id: 'Contact', text: 'Contact Us', path: '/contactus' }
       ]
     },
-    { 
-      id: 'WarningFAQS', 
-      icon: <CgDanger />, 
-      text: 'WarningFAQS', 
-      path: '/warningfaqs' 
+    {
+      id: 'WarningFAQS',
+      icon: <CgDanger />,
+      text: 'WarningFAQS',
+      path: '/warningfaqs'
     },
-    { 
-      id: 'Notifications', 
-      icon: <FaBell />, 
-      text: 'Notifications', 
-      path: '/notifications' 
+    {
+      id: 'Notifications',
+      icon: <FaBell />,
+      text: 'Notifications',
+      path: '/notifications'
     },
-    { 
-      id: 'Settings', 
-      icon: <MdSecurity className="text-xl" />, 
-      text: 'Security & Settings', 
-      path: '/settings' 
+    {
+      id: 'Settings',
+      icon: <MdSecurity className="text-xl" />,
+      text: 'Security & Settings',
+      path: '/settings'
     },
   ];
 
@@ -246,7 +223,7 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
         border-r border-pink-500/20
         shadow-2xl
       `}>
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-pink-500/5 via-red-500/5 to-transparent pointer-events-none" />
 
@@ -258,8 +235,8 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
         `}>
           {/* Logo */}
           {!collapsed ? (
-            <div 
-              className="flex items-center cursor-pointer group" 
+            <div
+              className="flex items-center cursor-pointer group"
               onClick={() => onNavigate('/')}
             >
               <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-red-500 rounded-xl flex items-center justify-center mr-3 overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300">
@@ -310,7 +287,7 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
             {menuItems.map((item) => {
               const isActive = activeItem === item.id || isSubItemActive(item.id, item.subItems);
               const isSubmenuOpen = openSubmenus[item.id];
-              
+
               return (
                 <li key={item.id}>
                   {/* Main Menu Item */}
@@ -437,7 +414,7 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
           </div>
 
           {/* Support & Logout */}
-          <div className="space-y-1">      
+          <div className="space-y-1">
             {/* Logout */}
             <div className="relative">
               <button
@@ -505,8 +482,8 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
               )}
             </div>
           ) : (
-            <div 
-              className="flex items-center cursor-pointer group" 
+            <div
+              className="flex items-center cursor-pointer group"
               onClick={() => onNavigate('/profile')}
             >
               <div className="relative">
