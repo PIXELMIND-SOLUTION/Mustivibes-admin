@@ -3,7 +3,7 @@ import axios from "axios";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle, FaShieldAlt } from "react-icons/fa";
 
-const API_URL = "http://31.97.206.144:4050/api/admin/change-password";
+const API_URL = "http://31.97.228.17:4055/api/admin/change-password";
 
 const Settings = ({ darkMode }) => {
   const dm = darkMode;

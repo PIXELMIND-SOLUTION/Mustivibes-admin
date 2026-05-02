@@ -10,7 +10,7 @@ import {
   FaCoins,
 } from "react-icons/fa";
 
-const API = "http://31.97.206.144:4050/api/packages";
+const API = "http://31.97.228.17:4055/api/packages";
 
 const AdminCoinPackages = ({ darkMode }) => {
   const [packages, setPackages] = useState([]);

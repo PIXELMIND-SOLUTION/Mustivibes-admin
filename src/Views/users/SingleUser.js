@@ -28,7 +28,7 @@ import {
   Eye
 } from "lucide-react";
 
-const API = "http://31.97.206.144:4050/api/users/users";
+const API = "http://31.97.228.17:4055/api/users/users";
 
 const SingleUser = ({ darkMode }) => {
   const { id } = useParams();

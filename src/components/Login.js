@@ -3,7 +3,7 @@ import axios from "axios";
 import { FiMail, FiLock, FiLogIn, FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://31.97.206.144:4050/api/admin/login";
+const API_URL = "http://31.97.228.17:4055/api/admin/login";
 
 const Login = () => {
   const navigate = useNavigate();

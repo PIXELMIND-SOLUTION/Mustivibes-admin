@@ -6,9 +6,9 @@ import {
   FaExclamationCircle, FaCheckCircle, FaTimesCircle, FaClock,
 } from "react-icons/fa";
 
-const API    = "http://31.97.206.144:4050/api/admin/reports";
-const HANDLE = "http://31.97.206.144:4050/api/admin/handle";
-const SINGLE = "http://31.97.206.144:4050/api/admin/report";
+const API    = "http://31.97.228.17:4055/api/admin/reports";
+const HANDLE = "http://31.97.228.17:4055/api/admin/handle";
+const SINGLE = "http://31.97.228.17:4055/api/admin/report";
 
 const Reports = ({ darkMode }) => {
   const dm = darkMode;

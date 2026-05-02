@@ -6,7 +6,7 @@ import {
   FaCheckCircle, FaClock, FaTimesCircle, FaSortUp, FaSortDown, FaSort,
 } from "react-icons/fa";
 
-const API = "http://31.97.206.144:4050/api/get/payments";
+const API = "http://31.97.228.17:4055/api/get/payments";
 
 // ─── EXPORT HELPERS ───────────────────────────────────────
 const exportCSV = (data) => {

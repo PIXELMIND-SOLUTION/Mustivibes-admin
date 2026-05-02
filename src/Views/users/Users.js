@@ -29,7 +29,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 
-const API_BASE = "http://31.97.206.144:4050/api/users";
+const API_BASE = "http://31.97.228.17:4055/api/users";
 const ALL_USERS_API = `${API_BASE}/users/all`;
 const UPDATE_USER_API = (userId) => `${API_BASE}/update/${userId}`;
 const DELETE_USER_API = (userId) => `${API_BASE}/delete/${userId}`;
