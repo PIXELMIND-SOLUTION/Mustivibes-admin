@@ -32,7 +32,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
 
   const adminData = JSON.parse(sessionStorage.getItem("AdminData"));
 
-  const NOTIFICATION_API = "http://31.97.206.144:4055/api/notifications";
+  const NOTIFICATION_API = "http://31.97.228.17:4055/api/notifications";
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -90,7 +90,7 @@ const Navbar = ({ toggleSidebar, toggleDarkMode, darkMode, collapsed, sidebarOpe
 
   const markNotificationRead = async (id) => {
     try {
-      await fetch(`http://31.97.206.144:4055/api/notifications/${id}/read`, {
+      await fetch(`http://31.97.228.17:4055/api/notifications/${id}/read`, {
         method: "PUT",
       });
 

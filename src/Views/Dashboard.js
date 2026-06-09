@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 
-const API = "http://31.97.206.144:4055/api/dashboard";
+const API = "http://31.97.228.17:4055/api/dashboard";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 const fmt = (n) => (n >= 1000 ? (n / 1000).toFixed(1) + "K" : n ?? 0);

@@ -6,7 +6,7 @@ import {
   FaChevronUp, FaListUl, FaEye,
 } from "react-icons/fa";
 
-const BASE = "http://31.97.206.144:4055/api";
+const BASE = "http://31.97.228.17:4055/api";
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 const Toast = ({ msg, type }) => (

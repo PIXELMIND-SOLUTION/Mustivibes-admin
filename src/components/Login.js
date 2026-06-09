@@ -14,37 +14,78 @@ const Login = () => {
   const [error,setError] = useState("");
   const [loading,setLoading] = useState(false);
 
-  const handleLogin = async(e)=>{
-    e.preventDefault();
-    setError("");
 
-    if(!email || !password){
-      setError("Enter email and password");
-      return;
-    }
+  const handleLogin = async (e) => {
 
-    try{
-      setLoading(true);
+  e.preventDefault();
 
-      const res = await axios.post(API_URL,{
-        email,
-        password
-      });
+  setError("");
 
-      if(res.data.success){
-        sessionStorage.setItem("adminToken",res.data.token);
-        sessionStorage.setItem("AdminData",JSON.stringify(res.data.admin));
-        sessionStorage.setItem("isAdmin","true");
+  // dummy credentials
+  if (
+    email === "admin@example.com" &&
+    password === "Admin@123"
+  ) {
 
-        navigate("/admin");
-      }
+    sessionStorage.setItem(
+      "adminToken",
+      "dummy_admin_token"
+    );
 
-    }catch(err){
-      setError(err.response?.data?.message || "Login failed");
-    }finally{
-      setLoading(false);
-    }
-  };
+    sessionStorage.setItem(
+      "AdminData",
+      JSON.stringify({
+        name: "Admin",
+        email: "admin@mustivibes.com",
+        role: "Admin"
+      })
+    );
+
+    sessionStorage.setItem(
+      "isAdmin",
+      "true"
+    );
+
+    navigate("/admin");
+
+    return;
+  }
+
+  setError("Invalid email or password");
+
+};
+
+  // const handleLogin = async(e)=>{
+  //   e.preventDefault();
+  //   setError("");
+
+  //   if(!email || !password){
+  //     setError("Enter email and password");
+  //     return;
+  //   }
+
+  //   try{
+  //     setLoading(true);
+
+  //     const res = await axios.post(API_URL,{
+  //       email,
+  //       password
+  //     });
+
+  //     if(res.data.success){
+  //       sessionStorage.setItem("adminToken",res.data.token);
+  //       sessionStorage.setItem("AdminData",JSON.stringify(res.data.admin));
+  //       sessionStorage.setItem("isAdmin","true");
+
+  //       navigate("/admin");
+  //     }
+
+  //   }catch(err){
+  //     setError(err.response?.data?.message || "Login failed");
+  //   }finally{
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex">

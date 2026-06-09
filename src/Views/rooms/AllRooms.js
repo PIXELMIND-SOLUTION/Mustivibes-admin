@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { FaSearch, FaDownload } from "react-icons/fa";
 
-const API = "http://31.97.206.144:4055/api/users/all";
+const API = "http://31.97.228.17:4055/api/users/all";
 
 const AllRooms = ({ darkMode }) => {
   const [rooms, setRooms] = useState([]);

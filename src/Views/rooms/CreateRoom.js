@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaMicrophone, FaVideo, FaTag, FaClock, FaCalendarAlt, FaRocket, FaCopy, FaCheck } from "react-icons/fa";
 
-const API = "http://31.97.206.144:4055/api/users/create";
+const API = "http://31.97.228.17:4055/api/users/create";
 
 const PRESET_TAGS = [
   "Motivation", "Friendship", "Fun", "Love",

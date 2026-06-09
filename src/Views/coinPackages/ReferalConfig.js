@@ -6,7 +6,7 @@ import { FaCoins, FaTrash, FaSave, FaPlus, FaExchangeAlt, FaMicrophone, FaVideo,
 // API CONSTANTS
 // ─────────────────────────────────────────────
 const REFERRAL_API = "http://31.97.228.17:4055/api/referral";
-const COIN_API     = "http://31.97.206.144:4055/api";
+const COIN_API     = "http://31.97.228.17:4055/api";
 
 // ─────────────────────────────────────────────
 // NAV TABS

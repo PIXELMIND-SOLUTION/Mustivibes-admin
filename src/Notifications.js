@@ -6,7 +6,7 @@ import {
   FaInbox, FaTimes, FaTrash, FaCommentAlt, FaFlask,
 } from "react-icons/fa";
 
-const BASE = "http://31.97.206.144:4055/api/notifications";
+const BASE = "http://31.97.228.17:4055/api/notifications";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 const fmtDate = (d) => {
