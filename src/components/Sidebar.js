@@ -92,7 +92,7 @@ const Sidebar = ({ sidebarOpen, darkMode, toggleSidebar, collapsed, toggleCollap
       text: 'Chat Rooms',
       path: '/allrooms',
       subItems: [
-        { id: 'Create Rooms', text: 'Create Chat Rooms', path: '/chatrooms' },
+        // { id: 'Create Rooms', text: 'Create Chat Rooms', path: '/chatrooms' },
         { id: 'All Rooms', text: 'All Chat Rooms', path: '/allrooms' }
       ]
     },
